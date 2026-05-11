@@ -418,7 +418,7 @@ function CardTile({ card, selected, onClick }) {
 
 function CardGrid({ cards, deckSet, onToggle, cols }) {
   return (
-    <div style={{ display:"grid",
+    <div className="cg" style={{ display:"grid",
       gridTemplateColumns:cols||"repeat(auto-fill,minmax(105px,1fr))", gap:8 }}>
       {cards.map(c => (
         <CardTile key={c._iid||c.id} card={c}
@@ -588,15 +588,15 @@ function SealedView({ pools, expanded, setExpanded, onRegen, onPrint, onDeck }) 
                   borderBottom: open ? `1px solid ${T.border}` : "none",
                   transition:"background 0.12s" }}>
                 <span style={{ fontWeight:600 }}>Pack {i + 1}</span>
-                <span style={{ display:"flex", gap:6, alignItems:"center" }}>
+                <span className="pk-notables" style={{ display:"flex", gap:6, alignItems:"center" }}>
                   {notable.map(c => { const m = RM[c.rarity]; return (
-                    <span key={c._iid} style={{ background:m.bg, color:m.fg,
+                    <span key={c._iid} className="pk-badge" style={{ background:m.bg, color:m.fg,
                       border:`1px solid ${m.bd}`, borderRadius:4,
                       fontSize:11, padding:"2px 8px", fontWeight:600 }}>
                       ✦ {c.name.replace(/ \(\d\)$/, "")}
                     </span>
                   ); })}
-                  <span style={{ color:T.dim, fontSize:14 }}>{open ? "▲" : "▼"}</span>
+                  <span style={{ color:T.dim, fontSize:14, flexShrink:0 }}>{open ? "▲" : "▼"}</span>
                 </span>
               </button>
               {open && (
@@ -713,7 +713,7 @@ function DeckView({ flatPool, deckSet, deckCards, onToggle, onPrint, hero, setHe
         <p style={{ margin:0, fontSize:13, color:T.muted, alignSelf:"center" }}>
           Click cards to add or remove from your deck
         </p>
-        <div style={{
+        <div className="dk-status" style={{
           background: isLegal ? "#0d2c1a" : T.surface,
           border:`1px solid ${isLegal ? "#2a7a4a" : T.border}`,
           borderRadius:8, padding:"10px 18px", minWidth:185, textAlign:"right" }}>
@@ -738,12 +738,17 @@ function DeckView({ flatPool, deckSet, deckCards, onToggle, onPrint, hero, setHe
         </div>
       </div>
 
-      <div style={{ display:"flex", gap:6, alignItems:"center", marginBottom:14, flexWrap:"wrap" }}>
+      {/* Filter row — scrollable on mobile */}
+      <div className="ctl" style={{ display:"flex", gap:5, alignItems:"center",
+        marginBottom:6, flexWrap:"wrap" }}>
         {[["ALL","All"],["DECK",`In deck (${deckCards.length})`],
-          ["C","Commons"],["R","Rares"],["M","Majestics"],["T","Tokens"]].map(([v,l]) => (
+          ["C","Commons"],["R","Rares"],["M","Majestics"],["B","Basics"],["T","Tokens"]].map(([v,l]) => (
           <Pill key={v} label={l} active={filter===v} onClick={() => setFilter(v)} />
         ))}
-        <div style={{ width:1, height:20, background:T.border, margin:"0 4px" }} />
+      </div>
+      {/* Sort + action row */}
+      <div style={{ display:"flex", gap:5, alignItems:"center",
+        marginBottom:14, flexWrap:"wrap" }}>
         {[["class","By class"],["rarity","By rarity"],["name","A–Z"]].map(([v,l]) => (
           <Pill key={v} label={l} active={sortMode===v} onClick={() => setSortMode(v)} />
         ))}
@@ -913,11 +918,77 @@ export default function App() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap');
 
-        /* Strip browser defaults so background fills the full viewport */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { background: ${T.bg}; }
         body { background: ${T.bg}; margin: 0; }
         #root, #app { width: 100%; }
+
+        /* Nav: horizontal scroll so tabs never overflow */
+        nav { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        nav::-webkit-scrollbar { display: none; }
+        nav > button { flex-shrink: 0; white-space: nowrap; }
+
+        /* Control pill rows: horizontal scroll class */
+        .ctl { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .ctl::-webkit-scrollbar { display: none; }
+
+        /* ── Mobile ≤ 680px ─────────────────────────────────── */
+        @media (max-width: 680px) {
+          /* Header: stack brand row above nav row */
+          .hd {
+            height: auto !important;
+            flex-wrap: wrap !important;
+            padding: 12px 16px 0 !important;
+            align-items: center !important;
+            gap: 0 !important;
+          }
+          .hd-brand { padding-right: 0 !important; }
+          .hd-date  { display: none !important; }
+          /* Nav fills full header width and sits on its own row */
+          .hd nav {
+            width: calc(100% + 32px);
+            margin-left: -16px;
+            padding: 0 16px;
+            border-top: 1px solid ${T.border};
+            margin-top: 6px;
+          }
+
+          /* Main: tighter padding on mobile */
+          .m-main { padding: 16px 14px !important; }
+
+          /* Pill rows: don't wrap, scroll instead */
+          .ctl { flex-wrap: nowrap !important; padding-bottom: 2px; }
+
+          /* Deck status box: full width, text left on mobile */
+          .dk-status {
+            min-width: unset !important;
+            width: 100% !important;
+            text-align: left !important;
+          }
+
+          /* Sealed accordion: truncate notable card badges so they don't bust the header */
+          .pk-notables { max-width: 50vw; overflow: hidden; gap: 4px !important; }
+          .pk-badge {
+            max-width: 30vw;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: inline-block !important;
+            vertical-align: middle;
+            flex-shrink: 1;
+          }
+
+          /* Card grids: slightly smaller tiles */
+          .cg {
+            grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)) !important;
+            gap: 6px !important;
+          }
+        }
+
+        /* ── Very small screens ≤ 380px ─────────────────────── */
+        @media (max-width: 380px) {
+          .cg { grid-template-columns: repeat(3, 1fr) !important; }
+        }
       `}</style>
 
       {/* FIX 3 — width: 100% on the root wrapper */}
@@ -928,14 +999,13 @@ export default function App() {
         {/* Header */}
         <header style={{ background:T.surface, borderBottom:`1px solid ${T.border}`,
           position:"sticky", top:0, zIndex:100, width:"100%" }}>
-          <div style={{ maxWidth:1280, margin:"0 auto", padding:"0 24px",
+          <div className="hd" style={{ maxWidth:1280, margin:"0 auto", padding:"0 24px",
             height:64, display:"flex", alignItems:"stretch" }}>
 
-            <div style={{ display:"flex", alignItems:"center", paddingRight:32, flexShrink:0 }}>
+            <div className="hd-brand" style={{ display:"flex", alignItems:"center", paddingRight:32, flexShrink:0 }}>
               <Brand />
             </div>
 
-            {/* FIX 1 — nav: pointerEvents instead of disabled attr */}
             <nav style={{ display:"flex", alignItems:"stretch", gap:0 }}>
               {tabs.map(tab => (
                 <button
@@ -960,7 +1030,7 @@ export default function App() {
               ))}
             </nav>
 
-            <div style={{ marginLeft:"auto", display:"flex", alignItems:"center",
+            <div className="hd-date" style={{ marginLeft:"auto", display:"flex", alignItems:"center",
               fontSize:11, color:T.dim, textAlign:"right", lineHeight:1.6, flexShrink:0 }}>
               Pre-release May 29<br/>Release June 5 2026
             </div>
@@ -971,7 +1041,7 @@ export default function App() {
         </header>
 
         {/* Main content */}
-        <main style={{ maxWidth:1280, margin:"0 auto", padding:"28px 24px" }}>
+        <main className="m-main" style={{ maxWidth:1280, margin:"0 auto", padding:"28px 24px" }}>
           {view==="home"   && <HomeView onGenPack={genPack} onGenSealed={genSealed} />}
           {view==="pack"   && pack   && <PackView  pack={pack}   onRegen={genPack}
             onPrint={() => openPrintWindow(pack)} />}
