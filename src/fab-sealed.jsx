@@ -1,5 +1,5 @@
 // FAB SEALED — Omens of the Third Age Sealed Practice Tool
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo, useRef } from "react";
 
 // ── CONSTANTS ────────────────────────────────────────────────────────────────
 
@@ -19,12 +19,21 @@ const T = {
 };
 
 const RM = {
-  T: { label:"Token",    bg:"#0f2b1a", fg:"#4ade80", bd:"#4ade8044" },
-  C: { label:"Common",  bg:"#1a1a1a", fg:"#b8bfd0", bd:"#b8bfd033" },
-  R: { label:"Rare",    bg:"#0b1c34", fg:"#60a5fa", bd:"#60a5fa44" },
-  M: { label:"Majestic",bg:"#1a0c34", fg:"#c084fc", bd:"#c084fc66" },
-  L: { label:"Legendary",bg:"#2c1804",fg:"#fbbf24", bd:"#fbbf2466" },
-  F: { label:"Fabled",  bg:"#2c0b0b", fg:"#f87171", bd:"#f8717166" },
+  T:  { label:"Token",    bg:"#0f2b1a", fg:"#4ade80", bd:"#4ade8044" },
+  B:  { label:"Basic",   bg:"#211608", fg:"#d4aa70", bd:"#d4aa7066" },
+  C:  { label:"Common",  bg:"#1a1a1a", fg:"#b8bfd0", bd:"#b8bfd033" },
+  R:  { label:"Rare",    bg:"#0b1c34", fg:"#60a5fa", bd:"#60a5fa44" },
+  M:  { label:"Majestic",bg:"#1a0c34", fg:"#c084fc", bd:"#c084fc66" },
+  L:  { label:"Legendary",bg:"#2c1804",fg:"#fbbf24", bd:"#fbbf2466" },
+  MV: { label:"Marvel",  bg:"#1d1206", fg:"#fde68a", bd:"#fde68a88" },
+  F:  { label:"Fabled",  bg:"#2c0b0b", fg:"#f87171", bd:"#f8717166" },
+};
+
+// Foil treatment overlays (applied on top of any base rarity)
+const FOIL = {
+  RF:  { badge:"RF",  label:"Rainbow Foil", fg:"#fcd34d", bg:"#261800", glow:"#fcd34d33" },
+  CF:  { badge:"CF",  label:"Cold Foil",    fg:"#93c5fd", bg:"#00142a", glow:"#93c5fd33" },
+  EXP: { badge:"EXP", label:"Expansion",    fg:"#d8b4fe", bg:"#18002e", glow:"#d8b4fe33" },
 };
 
 const CLASS_ORDER = [
@@ -127,14 +136,18 @@ function buildPool() {
     for (let i = 0; i < n; i++)
       pool.push({ id:`${pfx}${i}`, name:`Unrevealed ${RM[rarity].label}`, rarity, img:null, type });
   };
-  add("C",90,"uc","Unrevealed Common");   add("R",43,"ur","Unrevealed Rare");
-  add("M",26,"um","Unrevealed Majestic"); add("L", 4,"ul","Unrevealed Legendary");
-  add("F", 1,"uf","Unrevealed Fabled");
+  add("C", 90, "uc", "Unrevealed Common");
+  add("R", 43, "ur", "Unrevealed Rare");
+  add("M", 26, "um", "Unrevealed Majestic");
+  add("L",  4, "ul", "Unrevealed Legendary");
+  add("F",  1, "uf", "Unrevealed Fabled");
+  add("B", 14, "ub", "Unrevealed Basic");   // 14 Basic cards in OTA
+  add("MV",12, "umv","Unrevealed Marvel");  // 12 Marvel cards in OTA
   return pool;
 }
 
 const POOL = buildPool();
-const BY   = { T:[], C:[], R:[], M:[], L:[], F:[] };
+const BY   = { T:[], B:[], C:[], R:[], M:[], L:[], MV:[], F:[] };
 POOL.forEach(c => { if (BY[c.rarity]) BY[c.rarity].push(c); });
 
 let _uid = 0;
@@ -142,10 +155,58 @@ const stamp = (c, pi) => ({ ...c, _iid:`${pi}-${++_uid}`, _pack:pi });
 const pickN = (arr, n) => [...(arr||[])].sort(() => Math.random() - 0.5).slice(0, n);
 
 function buildPack(pi) {
-  const roll = Math.random();
-  const top  = roll < 0.01 && BY.F.length ? pickN(BY.F,1)
-    : roll < 0.07 && BY.L.length ? pickN(BY.L,1) : pickN(BY.M,1);
-  return [...pickN(BY.T,1), ...pickN(BY.C,11), ...pickN(BY.R,3), ...top].map(c => stamp(c, pi));
+  const pick1 = pool => pickN(pool?.length ? pool : BY.C, 1)[0];
+  const cards  = [];
+
+  // 11 Commons
+  cards.push(...pickN(BY.C, 11).map(c => ({...c})));
+
+  // Rare slot (always Rare)
+  const r1 = pick1(BY.R);
+  if (r1) cards.push({...r1});
+
+  // Rare-or-Majestic slot (~1 in 7 chance of Majestic)
+  const r2src = Math.random() < 1/7 && BY.M.length ? BY.M : BY.R;
+  const r2 = pick1(r2src);
+  if (r2) cards.push({...r2});
+
+  // Rainbow Foil: pick any card from set, weighted toward Commons
+  // ~62% RF Common, ~27% RF Rare, ~9% RF Majestic, ~2% RF Legendary/Marvel
+  const rfRoll = Math.random();
+  const rfSrc  = rfRoll < 0.62 ? BY.C
+    : rfRoll < 0.89 ? BY.R
+    : rfRoll < 0.98 ? BY.M
+    : [...BY.L, ...BY.MV].filter(Boolean);
+  const rfBase = pick1(rfSrc?.length ? rfSrc : BY.C);
+  if (rfBase) cards.push({ ...rfBase, foil:"RF" });
+
+  // Basic Slot 1: usually a Basic card; 1-in-24 packs replaced by Cold Foil
+  if (Math.random() < 1/24) {
+    const cfRoll = Math.random();
+    const cfSrc  = cfRoll < 0.50 ? BY.R : cfRoll < 0.85 ? BY.M : BY.L;
+    const cfBase = pick1(cfSrc?.length ? cfSrc : BY.R);
+    if (cfBase) cards.push({ ...cfBase, foil:"CF" });
+  } else {
+    const b = pick1(BY.B);
+    if (b) cards.push({...b});
+  }
+
+  // Basic Slot 2: Basic (~93%), Expansion Slot (~4%), Legendary (~2%),
+  //              Marvel (~0.6%), Fabled (~0.2%)
+  const s2 = Math.random();
+  if      (s2 < 0.002 && BY.F.length)  { cards.push({...pick1(BY.F) }); }
+  else if (s2 < 0.008 && BY.MV.length) { cards.push({...pick1(BY.MV)}); }
+  else if (s2 < 0.028 && BY.L.length)  { cards.push({...pick1(BY.L) }); }
+  else if (s2 < 0.068) {
+    // Expansion Slot (Extended Art): treated as a foil Rare/Majestic
+    const expBase = pick1([...BY.R, ...BY.M]);
+    if (expBase) cards.push({ ...expBase, foil:"EXP" });
+  } else {
+    const b = pick1(BY.B);
+    if (b) cards.push({...b});
+  }
+
+  return cards.map(c => stamp(c, pi));
 }
 
 function getClass(c) {
@@ -175,7 +236,7 @@ function groupCards(cards, mode) {
     return CLASS_ORDER.filter(k => g[k]?.length).map(k => ({ key:k, label:k, cards:g[k] }));
   }
   if (mode === "rarity") {
-    const ord = ["T","C","R","M","L","F"], g = {};
+    const ord = ["T","B","C","R","M","L","MV","F"], g = {};
     ord.forEach(r => { g[r] = []; });
     cards.forEach(c => { if (g[c.rarity]) g[c.rarity].push(c); });
     return ord.filter(r => g[r].length).map(r => ({ key:r, label:RM[r].label+"s", cards:g[r], rm:RM[r] }));
@@ -283,9 +344,16 @@ function CardTile({ card, selected, onClick }) {
   const [primaryErr, setPrimaryErr] = useState(false);
   const [backErr,    setBackErr]    = useState(false);
   const m            = RM[card.rarity] || RM.C;
+  const f            = card.foil ? FOIL[card.foil] : null;
   const isUnrevealed = !card.img;
   const showBack     = isUnrevealed || primaryErr;
   const showFallback = showBack && backErr;
+
+  const borderColor = selected ? m.fg : f ? f.fg + "99" : m.bd;
+  const shadow      = selected
+    ? `0 0 0 2px ${m.fg}55, 0 4px 20px #00000088`
+    : f ? `0 0 14px ${f.glow}, 0 2px 8px #00000066`
+    : "0 2px 8px #00000066";
 
   return (
     <div
@@ -293,8 +361,8 @@ function CardTile({ card, selected, onClick }) {
       style={{
         aspectRatio:"5/7", borderRadius:8, overflow:"hidden",
         position:"relative", background:m.bg,
-        border:`2px solid ${selected ? m.fg : m.bd}`,
-        boxShadow: selected ? `0 0 0 2px ${m.fg}55, 0 4px 20px #00000088` : "0 2px 8px #00000066",
+        border:`2px solid ${borderColor}`,
+        boxShadow: shadow,
         cursor: onClick ? "pointer" : "default",
         transition:"border-color 0.12s, box-shadow 0.12s, transform 0.1s",
       }}
@@ -324,6 +392,16 @@ function CardTile({ card, selected, onClick }) {
           border:`1px solid ${m.bd}`, borderRadius:3,
           padding:"1px 5px", fontSize:8, fontWeight:600, color:m.fg }}>{m.label}</div>
       )}
+      {/* Foil treatment badge (top-left) */}
+      {f && (
+        <div style={{ position:"absolute", top:4, left:4,
+          background: f.bg, border:`1px solid ${f.fg}99`,
+          borderRadius:3, padding:"1px 5px",
+          fontSize:8, fontWeight:700, color:f.fg, lineHeight:1.5 }}>
+          {f.badge}
+        </div>
+      )}
+      {/* Selected tick (top-right) */}
       {selected && (
         <div style={{ position:"absolute", top:4, right:4, width:18, height:18,
           borderRadius:"50%", background:m.fg, border:`2px solid ${T.bg}`,
@@ -397,9 +475,9 @@ function HomeView({ onGenPack, onGenSealed }) {
             <div style={{ fontSize:24, fontWeight:700, color:T.text }}>251</div>
             <div style={{ fontSize:12, color:T.muted }}>cards in set</div>
           </div>
-          <div style={{ fontSize:12, color:T.dim, textAlign:"right", lineHeight:1.7 }}>
-            {BY.C.length} Common · {BY.R.length} Rare<br/>
-            {BY.M.length} Majestic · {BY.L.length} Legendary · {BY.F.length} Fabled
+          <div style={{ fontSize:12, color:T.dim, textAlign:"right", lineHeight:1.8 }}>
+            {BY.C.length} Common · {BY.R.length} Rare · {BY.M.length} Majestic<br/>
+            {BY.L.length} Legendary · {BY.MV.length} Marvel · {BY.F.length} Fabled · {BY.B.length} Basic
           </div>
         </div>
         {counts.filter(x => x.r !== "C" && x.r !== "T").map(({ r, m, n }) => (
@@ -420,17 +498,27 @@ function HomeView({ onGenPack, onGenSealed }) {
         border:`1px solid ${T.border}`, padding:"14px 18px" }}>
         <div style={{ fontSize:12, color:T.muted, fontWeight:600, marginBottom:10,
           letterSpacing:"0.06em", textTransform:"uppercase" }}>Pack contents — 16 cards</div>
-        <div style={{ display:"flex", flexWrap:"wrap", gap:8,
-          alignItems:"center", fontSize:13, color:T.muted }}>
-          <span>1× <RarityBadge r="T" /></span>
-          <span style={{color:T.dim}}>·</span>
-          <span>11× <RarityBadge r="C" /></span>
-          <span style={{color:T.dim}}>·</span>
-          <span>3× <RarityBadge r="R" /></span>
-          <span style={{color:T.dim}}>·</span>
-          <span>1× <RarityBadge r="M" />
-            <span style={{fontSize:11,color:T.dim,marginLeft:5}}>(~7% Legendary · ~1% Fabled)</span>
-          </span>
+        <div style={{ display:"flex", flexDirection:"column", gap:6,
+          fontSize:13, color:T.muted }}>
+          <div>11× <RarityBadge r="C" /></div>
+          <div>1× <RarityBadge r="R" />
+            <span style={{color:T.dim,margin:"0 6px"}}>+</span>
+            <span>1× <RarityBadge r="R" /> or <RarityBadge r="M" /></span>
+          </div>
+          <div>
+            <span style={{ color:FOIL.RF.fg, background:FOIL.RF.bg,
+              border:`1px solid ${FOIL.RF.fg}88`, borderRadius:4,
+              fontSize:11, fontWeight:700, padding:"1px 7px", marginRight:6 }}>RF</span>
+            1× Rainbow Foil
+            <span style={{fontSize:11,color:T.dim,marginLeft:5}}>(Common · Rare · Majestic · ...)</span>
+          </div>
+          <div>2× <RarityBadge r="B" />
+            <span style={{fontSize:11,color:T.dim,marginLeft:5}}>
+              (slot 2 upgrades to Expansion · Legendary · Marvel · Fabled;
+              1-in-24 packs slot 1 replaced by{" "}
+              <span style={{ color:FOIL.CF.fg, fontWeight:700 }}>CF</span> Cold Foil)
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -683,31 +771,111 @@ function DeckView({ flatPool, deckSet, deckCards, onToggle, onPrint, hero, setHe
   );
 }
 
-// ── PRINT AREA ────────────────────────────────────────────────────────────────
+// ── PRINT ─────────────────────────────────────────────────────────────────────
+// Opens a dedicated window, waits for every image to load (or fail),
+// then auto-triggers print. This avoids the race condition where window.print()
+// fires before images have loaded.
 
-function PrintArea({ cards }) {
-  if (!cards) return null;
-  return (
-    <div id="fab-print-area">
-      {cards.map((c, i) => {
-        const m = RM[c.rarity] || RM.C;
-        return (
-          <div key={i} className="fab-print-card">
-            <img src={c.img || CARD_BACK} alt={c.name}
-              onError={e => {
-                if (e.target.src !== CARD_BACK) { e.target.src = CARD_BACK; return; }
-                e.target.style.display = "none";
-                if (e.target.nextSibling) e.target.nextSibling.style.display = "flex";
-              }} />
-            <div className="fab-print-fallback" style={{ background:m.bg, display:"none" }}>
-              <span style={{ fontSize:11, fontWeight:700, color:m.fg }}>{m.label}</span>
-              <span style={{ fontSize:10, fontWeight:700, color:m.fg }}>{c.name}</span>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+
+function openPrintWindow(cards) {
+  const w = window.open("", "_blank", "width=960,height=800");
+  if (!w) {
+    alert("Allow pop-ups for this site to use print, or use Ctrl+P / Cmd+P after dismissing.");
+    return;
+  }
+
+  // Build card HTML: revealed cards get <img>; unrevealed get a CSS-only "card back"
+  const cardsHTML = cards.map(c => {
+    const m = RM[c.rarity] || RM.C;
+    if (c.img) {
+      return `<div class="c" style="border-color:${m.bd}">
+        <img src="${esc(c.img)}"
+          onerror="this.style.display='none';var fb=this.nextSibling;if(fb)fb.style.display='flex'">
+        <div class="fb" style="background:${m.bg};display:none">
+          <span class="rl" style="color:${m.fg};background:${m.fg}22">${esc(m.label)}</span>
+          <span class="nm" style="color:${m.fg}">${esc(c.name)}</span>
+        </div>
+      </div>`;
+    }
+    // Unrevealed: CSS card back with a lightning bolt watermark
+    return `<div class="c" style="border-color:${m.bd}">
+      <div class="fb" style="background:${m.bg}">
+        <span class="bolt">&#9889;</span>
+        <span class="rl" style="color:${m.fg};background:${m.fg}22">${esc(m.label)}</span>
+      </div>
+    </div>`;
+  }).join("");
+
+  w.document.write(`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>FAB SEALED — ${cards.length} proxy cards</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#fff;font-family:sans-serif}
+    /* ── toolbar (hidden when printing) ── */
+    .bar{padding:12px 16px;background:#f5f5f5;border-bottom:1px solid #ddd;
+         display:flex;align-items:center;gap:10px;font-size:14px}
+    .bar strong{margin-right:4px}
+    .bar button{padding:7px 16px;border:none;border-radius:4px;
+                cursor:pointer;font-weight:600;font-size:13px}
+    .btn-print{background:#e8a820;color:#000}
+    .btn-close{background:#666;color:#fff}
+    /* ── card grid ── */
+    .g{display:grid;grid-template-columns:repeat(4,63mm);
+       grid-auto-rows:88mm;gap:2mm;padding:6mm}
+    .c{width:63mm;height:88mm;overflow:hidden;
+       border-radius:5px;border:2px solid;position:relative}
+    .c img{width:100%;height:100%;object-fit:cover;display:block}
+    .fb{position:absolute;inset:0;display:flex;flex-direction:column;
+        justify-content:center;align-items:center;gap:6px;padding:8px}
+    .rl{font-size:8px;font-weight:700;padding:2px 6px;border-radius:3px}
+    .nm{font-size:9px;font-weight:600;text-align:center;line-height:1.3}
+    .bolt{font-size:32px;opacity:.18;line-height:1}
+    /* ── print ── */
+    @media print{
+      .bar{display:none}
+      @page{margin:0;size:A4 portrait}
+    }
+    /* loading overlay */
+    #loading{position:fixed;inset:0;background:rgba(0,0,0,.55);
+             display:flex;align-items:center;justify-content:center;
+             color:#fff;font-size:18px;font-weight:600;letter-spacing:.05em;z-index:99}
+  </style>
+</head>
+<body>
+  <div id="loading">Loading card images…</div>
+  <div class="bar">
+    <strong>${cards.length}</strong> proxy cards ready &nbsp;
+    <button class="btn-print" onclick="window.print()">🖨 Print now</button>
+    <button class="btn-close" onclick="window.close()">Close</button>
+  </div>
+  <div class="g">${cardsHTML}</div>
+  <script>
+    // Hide loading overlay and auto-print once every image has loaded or failed
+    var imgs = document.querySelectorAll("img");
+    var pending = imgs.length;
+    function done() {
+      if (--pending <= 0) {
+        document.getElementById("loading").style.display = "none";
+        window.print();
+      }
+    }
+    if (pending === 0) {
+      document.getElementById("loading").style.display = "none";
+      window.print();
+    } else {
+      imgs.forEach(function(img) {
+        if (img.complete) { done(); }
+        else { img.onload = done; img.onerror = done; }
+      });
+    }
+  </script>
+</body>
+</html>`);
+  w.document.close();
 }
 
 // ── MAIN APP ──────────────────────────────────────────────────────────────────
@@ -719,15 +887,7 @@ export default function App() {
   const [flatPool,   setFlatPool] = useState([]);
   const [deckSet,    setDeckSet]  = useState(new Set());
   const [expanded,   setExpanded] = useState({});
-  const [printCards, setPrint]    = useState(null);
   const [hero,       setHero]     = useState(null);
-
-  // FIX 2 — print: fire window.print() after React re-renders PrintArea
-  useEffect(() => {
-    if (!printCards) return;
-    const id = setTimeout(() => window.print(), 400);
-    return () => clearTimeout(id);
-  }, [printCards]);
 
   const genPack = () => { setPack(buildPack(Date.now())); setView("pack"); };
   const genSealed = () => {
@@ -753,51 +913,17 @@ export default function App() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap');
 
-        /* FIX 3 — full width: strip browser defaults from root elements */
+        /* Strip browser defaults so background fills the full viewport */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { background: ${T.bg}; }
         body { background: ${T.bg}; margin: 0; }
         #root, #app { width: 100%; }
-
-        /* FIX 2 — print: visibility technique isolates #fab-print-area cleanly */
-        #fab-print-area { display: none; }
-
-        @media print {
-          * { visibility: hidden; }
-          #fab-print-area,
-          #fab-print-area * { visibility: visible; }
-          #fab-print-area {
-            display: flex !important;
-            flex-wrap: wrap;
-            gap: 2mm;
-            padding: 6mm;
-            background: white !important;
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%;
-          }
-          .fab-print-card {
-            width: 63mm; height: 88mm;
-            overflow: hidden; flex-shrink: 0;
-            break-inside: avoid; position: relative;
-          }
-          .fab-print-card img { width:100%; height:100%; object-fit:cover; display:block; }
-          .fab-print-fallback {
-            position: absolute; inset: 0;
-            flex-direction: column;
-            justify-content: center; align-items: center;
-            text-align: center; padding: 8px; gap: 4px;
-            font-family: sans-serif;
-          }
-        }
       `}</style>
 
       {/* FIX 3 — width: 100% on the root wrapper */}
       <div style={{ width:"100%", minHeight:"100vh",
         background:T.bg, color:T.text,
         fontFamily:"'Inter','Segoe UI',system-ui,sans-serif" }}>
-
-        <PrintArea cards={printCards} />
 
         {/* Header */}
         <header style={{ background:T.surface, borderBottom:`1px solid ${T.border}`,
@@ -848,13 +974,13 @@ export default function App() {
         <main style={{ maxWidth:1280, margin:"0 auto", padding:"28px 24px" }}>
           {view==="home"   && <HomeView onGenPack={genPack} onGenSealed={genSealed} />}
           {view==="pack"   && pack   && <PackView  pack={pack}   onRegen={genPack}
-            onPrint={() => setPrint(pack)} />}
+            onPrint={() => openPrintWindow(pack)} />}
           {view==="sealed" && pools  && <SealedView pools={pools} expanded={expanded}
             setExpanded={setExpanded} onRegen={genSealed}
-            onPrint={() => setPrint(flatPool)} onDeck={() => setView("deck")} />}
+            onPrint={() => openPrintWindow(flatPool)} onDeck={() => setView("deck")} />}
           {view==="deck"   && flatPool.length > 0 && <DeckView
             flatPool={flatPool} deckSet={deckSet} deckCards={deckCards}
-            onToggle={toggleCard} onPrint={() => setPrint(deckCards)}
+            onToggle={toggleCard} onPrint={() => openPrintWindow(deckCards)}
             hero={hero} setHero={setHero} />}
         </main>
       </div>
