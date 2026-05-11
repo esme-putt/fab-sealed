@@ -452,6 +452,26 @@ function GroupedGrid({ cards, deckSet, onToggle, sortMode, cols }) {
   );
 }
 
+// ── EMPTY STATE ──────────────────────────────────────────────────────────────
+
+function EmptyState({ icon, title, description, children }) {
+  return (
+    <div style={{ display:"flex", flexDirection:"column", alignItems:"center",
+      justifyContent:"center", textAlign:"center", padding:"64px 24px", gap:16 }}>
+      <div style={{ fontSize:52, lineHeight:1, opacity:0.6 }}>{icon}</div>
+      <div>
+        <div style={{ fontSize:18, fontWeight:600, color:T.text, marginBottom:6 }}>{title}</div>
+        <div style={{ fontSize:13, color:T.muted, maxWidth:340, lineHeight:1.7, margin:"0 auto" }}>
+          {description}
+        </div>
+      </div>
+      <div style={{ display:"flex", gap:10, flexWrap:"wrap", justifyContent:"center", marginTop:4 }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
 // ── VIEWS ─────────────────────────────────────────────────────────────────────
 
 function HomeView({ onGenPack, onGenSealed }) {
@@ -899,17 +919,23 @@ export default function App() {
     const ps = Array.from({ length:8 }, (_, i) => buildPack(i));
     setPools(ps); setFlatPool(ps.flat()); setDeckSet(new Set()); setExpanded({}); setView("sealed");
   };
+  // Like genSealed but stays on deck view — for the deck builder empty state
+  const genSealedAndBuild = () => {
+    const ps = Array.from({ length:8 }, (_, i) => buildPack(i));
+    setPools(ps); setFlatPool(ps.flat()); setDeckSet(new Set()); setExpanded({});
+    // don't call setView — stay on deck
+  };
   const toggleCard = c => {
     setDeckSet(p => { const n = new Set(p); n.has(c._iid) ? n.delete(c._iid) : n.add(c._iid); return n; });
   };
   const deckCards = flatPool.filter(c => deckSet.has(c._iid));
 
-  // FIX 1 — tabs: no HTML disabled attr, just opacity + pointerEvents
+  // All tabs are always clickable — empty states handle the "not yet generated" case
   const tabs = [
-    { id:"home",   label:"Overview",     icon:"⊞",  ready:true              },
-    { id:"pack",   label:"Booster pack", icon:"🃏", ready:!!pack             },
-    { id:"sealed", label:"Sealed pool",  icon:"📦", ready:!!pools            },
-    { id:"deck",   label:"Deck builder", icon:"✦",  ready:flatPool.length > 0 },
+    { id:"home",   label:"Overview",     icon:"⊞"  },
+    { id:"pack",   label:"Booster pack", icon:"🃏" },
+    { id:"sealed", label:"Sealed pool",  icon:"📦" },
+    { id:"deck",   label:"Deck builder", icon:"✦"  },
   ];
 
   return (
@@ -1010,19 +1036,16 @@ export default function App() {
               {tabs.map(tab => (
                 <button
                   key={tab.id}
-                  onClick={() => tab.ready && setView(tab.id)}
+                  onClick={() => setView(tab.id)}
                   style={{
                     background:"transparent", border:"none", fontFamily:"inherit",
-                    // ← no disabled prop; use CSS to block interaction
-                    pointerEvents: tab.ready ? "auto" : "none",
-                    cursor:        tab.ready ? "pointer" : "default",
-                    opacity:       tab.ready ? 1 : 0.35,
+                    cursor:"pointer",
                     padding:"0 16px", height:"100%", fontSize:13,
                     display:"inline-flex", alignItems:"center", gap:6,
                     borderBottom:`2px solid ${view===tab.id ? T.accent : "transparent"}`,
                     color: view===tab.id ? T.accent : T.muted,
                     fontWeight: view===tab.id ? 600 : 400,
-                    transition:"color 0.12s, border-color 0.12s, opacity 0.12s",
+                    transition:"color 0.12s, border-color 0.12s",
                   }}
                 >
                   <span>{tab.icon}</span>{tab.label}
@@ -1043,15 +1066,35 @@ export default function App() {
         {/* Main content */}
         <main className="m-main" style={{ maxWidth:1280, margin:"0 auto", padding:"28px 24px" }}>
           {view==="home"   && <HomeView onGenPack={genPack} onGenSealed={genSealed} />}
-          {view==="pack"   && pack   && <PackView  pack={pack}   onRegen={genPack}
-            onPrint={() => openPrintWindow(pack)} />}
-          {view==="sealed" && pools  && <SealedView pools={pools} expanded={expanded}
-            setExpanded={setExpanded} onRegen={genSealed}
-            onPrint={() => openPrintWindow(flatPool)} onDeck={() => setView("deck")} />}
-          {view==="deck"   && flatPool.length > 0 && <DeckView
-            flatPool={flatPool} deckSet={deckSet} deckCards={deckCards}
-            onToggle={toggleCard} onPrint={() => openPrintWindow(deckCards)}
-            hero={hero} setHero={setHero} />}
+
+          {view==="pack" && (pack
+            ? <PackView pack={pack} onRegen={genPack} onPrint={() => openPrintWindow(pack)} />
+            : <EmptyState icon="🃏" title="No pack generated yet"
+                description="Generate a booster pack to open 16 cards from Omens of the Third Age.">
+                <Btn onClick={genPack}>Generate booster pack</Btn>
+              </EmptyState>
+          )}
+
+          {view==="sealed" && (pools
+            ? <SealedView pools={pools} expanded={expanded} setExpanded={setExpanded}
+                onRegen={genSealed} onPrint={() => openPrintWindow(flatPool)}
+                onDeck={() => setView("deck")} />
+            : <EmptyState icon="📦" title="No sealed pool yet"
+                description="Generate 8 booster packs to practice building a sealed deck.">
+                <Btn onClick={genSealed}>Generate sealed pool</Btn>
+              </EmptyState>
+          )}
+
+          {view==="deck" && (flatPool.length > 0
+            ? <DeckView flatPool={flatPool} deckSet={deckSet} deckCards={deckCards}
+                onToggle={toggleCard} onPrint={() => openPrintWindow(deckCards)}
+                hero={hero} setHero={setHero} />
+            : <EmptyState icon="✦" title="No cards to build with"
+                description="You need a sealed pool before you can build a deck. Generate one now and go straight to the deck builder.">
+                <Btn onClick={genSealedAndBuild}>Generate pool &amp; build</Btn>
+                <Btn ghost onClick={genSealed}>Go to sealed pool first</Btn>
+              </EmptyState>
+          )}
         </main>
       </div>
     </>
