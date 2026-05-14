@@ -5,6 +5,7 @@ import { useState, useMemo, useRef } from "react";
 
 const CARD_BACK = "https://fabdb2.imgix.net/cards/backs/cardback1.png";
 const SCG = "https://scg-static.starcitygames.com/articles/2026/";
+const LSS = "https://legendstory-production-s3-public.s3.amazonaws.com/media/cards/normal/";
 
 const T = {
   bg:       "#08080f",
@@ -38,14 +39,38 @@ const FOIL = {
 
 const CLASS_ORDER = [
   "Lightning","Lightning Runeblade","Lightning Wizard","Lightning Illusionist",
-  "Illusionist / Wizard","Wizard","Assassin","Brute","Guardian","Reviled Guardian",
-  "Mechanologist","Pirate Mechanologist","Pirate Ranger","Generic","Token / Macro","Unrevealed",
+  "Illusionist / Wizard","Wizard","Runeblade","Draconic","Assassin","Brute",
+  "Guardian","Reviled Guardian","Mechanologist","Pirate Mechanologist","Pirate Ranger",
+  "Ranger","Generic","Token / Macro","Unrevealed",
 ];
 
 const HEROES = [
   { id:"h1", name:"Aurora",          img:SCG+"04/2e1a3d31-aurora.webp",  cls:"Lightning Runeblade"   },
   { id:"h2", name:"Oscilio",         img:SCG+"04/0204988f-oscilio.webp", cls:"Lightning Wizard"      },
   { id:"h3", name:"Zyggy Starlight", img:SCG+"04/599fcee0-zyggy.webp",  cls:"Lightning Illusionist" },
+];
+
+// Pre-release kit promo pack — exact contents as announced
+const PROMO_PACK = [
+  // Hero cards
+  { id:"pr-h1", name:"Aurora, Emissary of Lightning",  rarity:"M", img:SCG+"04/2e1a3d31-aurora.webp",                          type:"Lightning Runeblade Hero"   },
+  { id:"pr-h2", name:"Oscilio, Scion of the Third Age",rarity:"M", img:SCG+"04/0204988f-oscilio.webp",                         type:"Lightning Wizard Hero"      },
+  { id:"pr-h3", name:"Zyggy",                          rarity:"M", img:SCG+"04/599fcee0-zyggy.webp",                           type:"Lightning Illusionist Hero" },
+  // Signature weapons
+  { id:"pr-m3", name:"Scorpio, Comet Tail",            rarity:"M", img:SCG+"04/4094afd0-scorpio.webp",                         type:"Lightning Runeblade Weapon" },
+  { id:"pr-m5", name:"Volzar, Meteor Storm",           rarity:"M", img:SCG+"04/120447cf-volzar.webp",                          type:"Lightning Wizard Weapon"    },
+  { id:"pr-m6", name:"Aphrodias",                      rarity:"M", img:SCG+"04/c1e37f61-aphrodias.webp",                       type:"Lightning Illusionist Weapon"},
+  // Astral Sanctuary equipment set
+  { id:"pr-r16", name:"Helm of Astral Sanctuary",      rarity:"R", img:SCG+"05/9ba16fe6-helm-of-astral-sanctuary.webp",        type:"Equipment — Head"  },
+  { id:"pr-r17", name:"Robe of Astral Sanctuary",      rarity:"R", img:SCG+"05/9ba16fe6-robe-of-astral-sanctuary.webp",        type:"Equipment — Chest" },
+  { id:"pr-r15", name:"Gloves of Astral Sanctuary",    rarity:"R", img:SCG+"05/2a88d2f0-gloves-of-astral-sanctuary.webp",      type:"Equipment — Arms"  },
+  { id:"pr-r14", name:"Boots of Astral Sanctuary",     rarity:"R", img:SCG+"05/2a88d2f0-boots-of-astral-sanctuary.webp",       type:"Equipment — Legs"  },
+  // Commons (all three pitches)
+  { id:"pr-c4",  name:"Glide Through Starlight (1)",   rarity:"C", img:SCG+"05/c4e8e688-glide-through-starlight-r.webp",       type:"Lightning Action", pitch:1 },
+  { id:"pr-c5",  name:"Glide Through Starlight (2)",   rarity:"C", img:SCG+"05/c4e8e688-glide-through-starlight-y.webp",       type:"Lightning Action", pitch:2 },
+  { id:"pr-c6",  name:"Glide Through Starlight (3)",   rarity:"C", img:SCG+"05/c4e8e688-glide-through-starlight-b.webp",       type:"Lightning Action", pitch:3 },
+  // Macro
+  { id:"pr-t4",  name:"Omens of Arcana",               rarity:"T", img:SCG+"04/6d6f6837-omens-of-arcana-383x535.webp",         type:"Macro" },
 ];
 
 const REVEALED = [
@@ -126,6 +151,45 @@ const REVEALED = [
   {id:"m10",name:"Lionclaw Maul",           rarity:"M",img:SCG+"05/0fbc753e-lionclaw-maul-383x535.webp",            type:"Reviled Guardian Weapon — Maul"},
   {id:"m11",name:"Tome of Quandaries",      rarity:"M",img:SCG+"05/aac8c493-tome-of-quandaries.webp",               type:"Wizard Equipment — Off-Hand"},
   {id:"l1", name:"Stormshard",rarity:"L",img:SCG+"03/dfa65a69-stormshard.png",type:"Lightning Action"},
+
+  // ── Newly revealed (May 13 2026 update) ─────────────────────────────────────
+  // Lightning
+  {id:"n1", name:"Flowshard Elemental",    rarity:"M", img:SCG+"05/4c94b2cf-flowshard-elemental.webp",                  type:"Lightning Action"},
+  {id:"n2", name:"Cosmic Flare",           rarity:"R", img:SCG+"05/b65a01fd-cosmic-flare.webp",                          type:"Lightning Action"},
+  {id:"n3", name:"Livewire Press",         rarity:"R", img:SCG+"05/037c074c-livewire-press.webp",                        type:"Lightning Action"},
+  // Runeblade
+  {id:"n4", name:"Gauntlet of Sword and Sorcery", rarity:"R", img:SCG+"05/475c63bd-gauntlet-of-sword-and-sorcery-383x535.webp", type:"Runeblade Equipment"},
+  // Guardian / Warrior
+  {id:"n5", name:"A Bit Off the Side",     rarity:"C", img:SCG+"05/6ee5cf04-a-bit-off-the-side-383x535.webp",            type:"Guardian Warrior Action"},
+  // Ranger
+  {id:"n6", name:"Settle the Bill",        rarity:"C", img:SCG+"05/8ba62b83-settle-the-bill-383x535.webp",               type:"Ranger Action"},
+  // Ninja
+  {id:"n7", name:"Evasive Nageboshi",      rarity:"R", img:SCG+"05/c8b89ab0-evasive-nageboshi.webp",                     type:"Ninja Equipment — Off-Hand"},
+  {id:"n8", name:"Razor Ring",             rarity:"C", img:SCG+"05/c8b89ab0-razor-ring.webp",                            type:"Ninja Weapon"},
+  {id:"n9", name:"Stun Star",              rarity:"C", img:SCG+"05/c8b89ab0-stun-star.webp",                             type:"Ninja Equipment"},
+  // Light
+  {id:"n10",name:"Blessing of Aegis",      rarity:"R", img:SCG+"05/95a486fd-blessing-of-aegis-383x535.webp",             type:"Light Action"},
+  // Generic
+  {id:"n11",name:"Browbeat",               rarity:"C", img:SCG+"05/e509ac2f-browbeat.webp",                              type:"Generic Action"},
+  {id:"n12",name:"Ominous Excavation",     rarity:"C", img:SCG+"05/042f4090-ominous-excavation.webp",                    type:"Generic Action"},
+  {id:"n13",name:"Ominous Respite",        rarity:"R", img:SCG+"05/1033e291-ominous-respite-383x535.webp",               type:"Generic Instant", pitch:2},
+
+  // ── Calling Rotterdam reveal ─────────────────────────────────────────────
+  {id:"n14",name:"Boots of Omnis Ward",    rarity:"R", img:LSS+"OMN204-RF.webp",                                       type:"Generic Equipment — Legs"},
+
+  // ── World Premiere / Fabrary revealed tab ────────────────────────────────
+  // Runeblade (non-Lightning)
+  {id:"n15",name:"Caress of the Reaper",   rarity:"M", img:LSS+"OMN087.webp",  type:"Runeblade Attack Action", pitch:1},
+  {id:"n16",name:"Arcanic Cunning (1)",    rarity:"R", img:LSS+"OMN088.webp",  type:"Runeblade Attack Action", pitch:1},
+  {id:"n17",name:"Arcanic Cunning (2)",    rarity:"R", img:LSS+"OMN089.webp",  type:"Runeblade Attack Action", pitch:2},
+  {id:"n18",name:"Arcanic Cunning (3)",    rarity:"R", img:LSS+"OMN090.webp",  type:"Runeblade Attack Action", pitch:3},
+  // Draconic
+  {id:"n19",name:"Draco Fire",             rarity:"M", img:LSS+"OMN245.webp",  type:"Draconic Instant",        pitch:1},
+  // Ranger (Majestic upgrade of existing Common)
+  {id:"n20",name:"Settle the Bill (2)",    rarity:"M", img:LSS+"OMN237.webp",  type:"Ranger Action",           pitch:2},
+  // Generic Rare
+  {id:"n21",name:"Ominous Respite (1)",    rarity:"R", img:LSS+"OMN216.webp",  type:"Generic Instant",         pitch:1},
+  {id:"n22",name:"Ominous Respite (3)",    rarity:"R", img:LSS+"OMN219.webp",  type:"Generic Instant",         pitch:3},
 ];
 
 // ── DATA SETUP ───────────────────────────────────────────────────────────────
@@ -136,13 +200,15 @@ function buildPool() {
     for (let i = 0; i < n; i++)
       pool.push({ id:`${pfx}${i}`, name:`Unrevealed ${RM[rarity].label}`, rarity, img:null, type });
   };
-  add("C", 90, "uc", "Unrevealed Common");
-  add("R", 43, "ur", "Unrevealed Rare");
-  add("M", 26, "um", "Unrevealed Majestic");
+  // Adjusted for all known reveals through World Premiere
+  add("C", 82, "uc", "Unrevealed Common");  // +1: Ominous Respite n13 moved from C→R
+  add("R", 31, "ur", "Unrevealed Rare");    // 60 total - 29 revealed R
+  add("M", 22, "um", "Unrevealed Majestic");// 37 total - 15 revealed M
+  add("M", 25, "um", "Unrevealed Majestic");
   add("L",  4, "ul", "Unrevealed Legendary");
   add("F",  1, "uf", "Unrevealed Fabled");
-  add("B", 14, "ub", "Unrevealed Basic");   // 14 Basic cards in OTA
-  add("MV",12, "umv","Unrevealed Marvel");  // 12 Marvel cards in OTA
+  add("B", 14, "ub", "Unrevealed Basic");
+  add("MV",12, "umv","Unrevealed Marvel");
   return pool;
 }
 
@@ -150,59 +216,88 @@ const POOL = buildPool();
 const BY   = { T:[], B:[], C:[], R:[], M:[], L:[], MV:[], F:[] };
 POOL.forEach(c => { if (BY[c.rarity]) BY[c.rarity].push(c); });
 
+// Commons split by class for pack collation.
+// FaB limited sets use "6-7 class commons evenly distributed between classes."
+// OTA has 3 Lightning heroes → 3 per class + 2 generic = 11 commons per pack.
+const CC = {
+  runeblade:   POOL.filter(c => c.rarity==="C" && (c.type||"").includes("Lightning Runeblade")),
+  wizard:      POOL.filter(c => c.rarity==="C" && (c.type||"").includes("Lightning Wizard")),
+  illusionist: POOL.filter(c => c.rarity==="C" && (c.type||"").includes("Lightning Illusionist")),
+  generic:     POOL.filter(c => c.rarity==="C"
+    && !(c.type||"").includes("Lightning Runeblade")
+    && !(c.type||"").includes("Lightning Wizard")
+    && !(c.type||"").includes("Lightning Illusionist")),
+};
+
 let _uid = 0;
 const stamp = (c, pi) => ({ ...c, _iid:`${pi}-${++_uid}`, _pack:pi });
 const pickN = (arr, n) => [...(arr||[])].sort(() => Math.random() - 0.5).slice(0, n);
 
-function buildPack(pi) {
-  const pick1 = pool => pickN(pool?.length ? pool : BY.C, 1)[0];
+function buildPack(pi, revealedOnly = false) {
+  const rev = c => !revealedOnly || !!c.img;
+
+  // Pre-filter all pools when revealedOnly is active
+  const rPool  = BY.R.filter(rev);
+  const mPool  = BY.M.filter(rev);
+  const lPool  = BY.L.filter(rev);
+  const fPool  = BY.F.filter(rev);
+  const bPool  = BY.B.filter(rev);
+  const mvPool = BY.MV.filter(rev);
+  const ccR    = CC.runeblade.filter(rev);
+  const ccW    = CC.wizard.filter(rev);
+  const ccI    = CC.illusionist.filter(rev);
+  const ccG    = CC.generic.filter(rev);
+
+  const pick1 = pool => pickN(pool?.length ? pool : rPool, 1)[0];
   const cards  = [];
 
-  // 11 Commons
-  cards.push(...pickN(BY.C, 11).map(c => ({...c})));
+  // 11 Commons — collated by class: 3 per Lightning class + 2 generic
+  // Mirrors FaB's "evenly distributed between classes" limited design principle
+  const commons = [
+    ...pickN(ccR, 3), ...pickN(ccW, 3), ...pickN(ccI, 3), ...pickN(ccG, 2),
+  ];
+  cards.push(...commons.map(c => ({...c})));
 
   // Rare slot (always Rare)
-  const r1 = pick1(BY.R);
+  const r1 = pick1(rPool);
   if (r1) cards.push({...r1});
 
   // Rare-or-Majestic slot (~1 in 7 chance of Majestic)
-  const r2src = Math.random() < 1/7 && BY.M.length ? BY.M : BY.R;
+  const r2src = Math.random() < 1/7 && mPool.length ? mPool : rPool;
   const r2 = pick1(r2src);
   if (r2) cards.push({...r2});
 
   // Rainbow Foil: pick any card from set, weighted toward Commons
-  // ~62% RF Common, ~27% RF Rare, ~9% RF Majestic, ~2% RF Legendary/Marvel
   const rfRoll = Math.random();
-  const rfSrc  = rfRoll < 0.62 ? BY.C
-    : rfRoll < 0.89 ? BY.R
-    : rfRoll < 0.98 ? BY.M
-    : [...BY.L, ...BY.MV].filter(Boolean);
-  const rfBase = pick1(rfSrc?.length ? rfSrc : BY.C);
+  const rfSrc  = rfRoll < 0.62 ? ccG     // generic commons for RF (most common)
+    : rfRoll < 0.89 ? rPool
+    : rfRoll < 0.98 ? mPool
+    : [...lPool, ...mvPool].filter(Boolean);
+  const rfBase = pick1(rfSrc?.length ? rfSrc : BY.C.filter(rev));
   if (rfBase) cards.push({ ...rfBase, foil:"RF" });
 
   // Basic Slot 1: usually a Basic card; 1-in-24 packs replaced by Cold Foil
   if (Math.random() < 1/24) {
     const cfRoll = Math.random();
-    const cfSrc  = cfRoll < 0.50 ? BY.R : cfRoll < 0.85 ? BY.M : BY.L;
-    const cfBase = pick1(cfSrc?.length ? cfSrc : BY.R);
+    const cfSrc  = cfRoll < 0.50 ? rPool : cfRoll < 0.85 ? mPool : lPool;
+    const cfBase = pick1(cfSrc?.length ? cfSrc : rPool);
     if (cfBase) cards.push({ ...cfBase, foil:"CF" });
   } else {
-    const b = pick1(BY.B);
+    const b = pick1(bPool);
     if (b) cards.push({...b});
   }
 
   // Basic Slot 2: Basic (~93%), Expansion Slot (~4%), Legendary (~2%),
   //              Marvel (~0.6%), Fabled (~0.2%)
   const s2 = Math.random();
-  if      (s2 < 0.002 && BY.F.length)  { cards.push({...pick1(BY.F) }); }
-  else if (s2 < 0.008 && BY.MV.length) { cards.push({...pick1(BY.MV)}); }
-  else if (s2 < 0.028 && BY.L.length)  { cards.push({...pick1(BY.L) }); }
+  if      (s2 < 0.002 && fPool.length)  { cards.push({...pick1(fPool) }); }
+  else if (s2 < 0.008 && mvPool.length) { cards.push({...pick1(mvPool)}); }
+  else if (s2 < 0.028 && lPool.length)  { cards.push({...pick1(lPool) }); }
   else if (s2 < 0.068) {
-    // Expansion Slot (Extended Art): treated as a foil Rare/Majestic
-    const expBase = pick1([...BY.R, ...BY.M]);
+    const expBase = pick1([...rPool, ...mPool]);
     if (expBase) cards.push({ ...expBase, foil:"EXP" });
   } else {
-    const b = pick1(BY.B);
+    const b = pick1(bPool);
     if (b) cards.push({...b});
   }
 
@@ -219,6 +314,8 @@ function getClass(c) {
   if (t.includes("Lightning"))                          return "Lightning";
   if (t.includes("Illusionist")&&t.includes("Wizard")) return "Illusionist / Wizard";
   if (t.includes("Wizard"))                             return "Wizard";
+  if (t.includes("Draconic"))                           return "Draconic";
+  if (t.includes("Runeblade"))                          return "Runeblade";
   if (t.includes("Pirate Mechanologist"))               return "Pirate Mechanologist";
   if (t.includes("Pirate Ranger"))                      return "Pirate Ranger";
   if (t.includes("Reviled Guardian"))                   return "Reviled Guardian";
@@ -226,6 +323,7 @@ function getClass(c) {
   if (t.includes("Mechanologist"))                      return "Mechanologist";
   if (t.includes("Assassin"))                           return "Assassin";
   if (t.includes("Brute"))                              return "Brute";
+  if (t.includes("Ranger"))                             return "Ranger";
   return "Generic";
 }
 
@@ -474,7 +572,7 @@ function EmptyState({ icon, title, description, children }) {
 
 // ── VIEWS ─────────────────────────────────────────────────────────────────────
 
-function HomeView({ onGenPack, onGenSealed }) {
+function HomeView({ onGenPack, onGenSealed, onPrintTokens, revealedOnly, onToggleRevealedOnly }) {
   const counts = Object.entries(RM).map(([r,m]) => ({ r,m, n:BY[r].length })).filter(x => x.n);
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:"1.5rem" }}>
@@ -509,9 +607,71 @@ function HomeView({ onGenPack, onGenSealed }) {
         ))}
       </div>
 
-      <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
+      <div style={{ display:"flex", gap:10, flexWrap:"wrap", alignItems:"center" }}>
         <Btn onClick={onGenPack}>🃏 Generate booster pack</Btn>
         <Btn ghost onClick={onGenSealed}>📦 Generate sealed pool (8 packs)</Btn>
+        {/* Revealed-only toggle */}
+        <button
+          onClick={onToggleRevealedOnly}
+          title={revealedOnly
+            ? "Packs use only the ~80 spoiled cards with real art"
+            : "Packs include ~170 unrevealed placeholder cards"}
+          style={{
+            display:"inline-flex", alignItems:"center", gap:7,
+            padding:"7px 12px", borderRadius:6, cursor:"pointer",
+            fontFamily:"inherit", fontSize:12, fontWeight:600,
+            background: revealedOnly ? T.accent+"22" : "transparent",
+            color:       revealedOnly ? T.accent       : T.muted,
+            border:`1px solid ${revealedOnly ? T.accent+"66" : T.border}`,
+            transition:"all 0.15s",
+          }}
+        >
+          {/* Toggle pill */}
+          <span style={{
+            display:"inline-flex", width:30, height:16, borderRadius:8, flexShrink:0,
+            background: revealedOnly ? T.accent : T.dim,
+            position:"relative", transition:"background 0.15s",
+          }}>
+            <span style={{
+              position:"absolute", top:2, left: revealedOnly ? 16 : 2,
+              width:12, height:12, borderRadius:"50%", background:"#fff",
+              transition:"left 0.15s",
+            }} />
+          </span>
+          Revealed cards only
+        </button>
+      </div>
+
+      {/* Pre-release promo pack section */}
+      <div style={{ background:T.surface, borderRadius:8,
+        border:`1px solid ${T.border}`, padding:"14px 18px" }}>
+        <div style={{ fontSize:12, color:T.muted, fontWeight:600, marginBottom:4,
+          letterSpacing:"0.06em", textTransform:"uppercase" }}>Pre-release promo pack</div>
+        <p style={{ fontSize:13, color:T.muted, margin:"0 0 12px", lineHeight:1.6 }}>
+          14 cards included in the pre-release kit — heroes, signature weapons, the Astral Sanctuary equipment set, Glide Through Starlight, and the Omens of Arcana macro.
+        </p>
+        {/* Scrollable thumbnail row */}
+        <div style={{ overflowX:"auto", paddingBottom:4, marginBottom:12 }}>
+          <div style={{ display:"flex", gap:6, width:"max-content" }}>
+            {PROMO_PACK.map(t => {
+              const m = RM[t.rarity] || RM.C;
+              return (
+                <div key={t.id} style={{ width:48, flexShrink:0 }}>
+                  <div style={{ aspectRatio:"5/7", borderRadius:4, overflow:"hidden",
+                    border:`1px solid ${m.bd}` }}>
+                    <img src={t.img} alt={t.name}
+                      style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
+                  </div>
+                  <div style={{ fontSize:8, color:T.dim, marginTop:3, lineHeight:1.3,
+                    textAlign:"center", wordBreak:"break-word" }}>
+                    {t.name.replace(/ \(\d\)$/, "")}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <Btn ghost onClick={onPrintTokens}>🖨 Print promo pack</Btn>
       </div>
 
       <div style={{ background:T.surface, borderRadius:8,
@@ -849,10 +1009,11 @@ function openPrintWindow(cards) {
     .btn-print{background:#e8a820;color:#000}
     .btn-close{background:#666;color:#fff}
     /* ── card grid ── */
-    .g{display:grid;grid-template-columns:repeat(4,63mm);
-       grid-auto-rows:88mm;gap:2mm;padding:6mm}
+    /* 3 × 63mm = 189mm, fits on A4 (210mm) and US Letter (216mm) with 5mm margins */
+    .g{display:grid;grid-template-columns:repeat(3,63mm);
+       grid-auto-rows:88mm;gap:3mm;padding:5mm}
     .c{width:63mm;height:88mm;overflow:hidden;
-       border-radius:5px;border:2px solid;position:relative}
+       border-radius:3mm;border:2px solid;position:relative}
     .c img{width:100%;height:100%;object-fit:cover;display:block}
     .fb{position:absolute;inset:0;display:flex;flex-direction:column;
         justify-content:center;align-items:center;gap:6px;padding:8px}
@@ -862,7 +1023,7 @@ function openPrintWindow(cards) {
     /* ── print ── */
     @media print{
       .bar{display:none}
-      @page{margin:0;size:A4 portrait}
+      @page{margin:5mm;size:A4 portrait}
     }
     /* loading overlay */
     #loading{position:fixed;inset:0;background:rgba(0,0,0,.55);
@@ -913,15 +1074,16 @@ export default function App() {
   const [deckSet,    setDeckSet]  = useState(new Set());
   const [expanded,   setExpanded] = useState({});
   const [hero,       setHero]     = useState(null);
+  const [revealedOnly, setRevealedOnly] = useState(false);
 
-  const genPack = () => { setPack(buildPack(Date.now())); setView("pack"); };
+  const genPack = () => { setPack(buildPack(Date.now(), revealedOnly)); setView("pack"); };
   const genSealed = () => {
-    const ps = Array.from({ length:8 }, (_, i) => buildPack(i));
+    const ps = Array.from({ length:8 }, (_, i) => buildPack(i, revealedOnly));
     setPools(ps); setFlatPool(ps.flat()); setDeckSet(new Set()); setExpanded({}); setView("sealed");
   };
   // Like genSealed but stays on deck view — for the deck builder empty state
   const genSealedAndBuild = () => {
-    const ps = Array.from({ length:8 }, (_, i) => buildPack(i));
+    const ps = Array.from({ length:8 }, (_, i) => buildPack(i, revealedOnly));
     setPools(ps); setFlatPool(ps.flat()); setDeckSet(new Set()); setExpanded({});
     // don't call setView — stay on deck
   };
@@ -929,6 +1091,9 @@ export default function App() {
     setDeckSet(p => { const n = new Set(p); n.has(c._iid) ? n.delete(c._iid) : n.add(c._iid); return n; });
   };
   const deckCards = flatPool.filter(c => deckSet.has(c._iid));
+
+  // Promo pack print — all 14 pre-release kit cards
+  const printTokens = () => openPrintWindow(PROMO_PACK.map((c, i) => ({ ...c, _iid:`promo-${i}`, _pack:0 })));
 
   // All tabs are always clickable — empty states handle the "not yet generated" case
   const tabs = [
@@ -1065,7 +1230,8 @@ export default function App() {
 
         {/* Main content */}
         <main className="m-main" style={{ maxWidth:1280, margin:"0 auto", padding:"28px 24px" }}>
-          {view==="home"   && <HomeView onGenPack={genPack} onGenSealed={genSealed} />}
+          {view==="home"   && <HomeView onGenPack={genPack} onGenSealed={genSealed} onPrintTokens={printTokens}
+              revealedOnly={revealedOnly} onToggleRevealedOnly={() => setRevealedOnly(x => !x)} />}
 
           {view==="pack" && (pack
             ? <PackView pack={pack} onRegen={genPack} onPrint={() => openPrintWindow(pack)} />
