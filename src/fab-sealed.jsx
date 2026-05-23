@@ -39,195 +39,316 @@ const FOIL = {
 
 const CLASS_ORDER = [
   "Lightning","Lightning Runeblade","Lightning Wizard","Lightning Illusionist",
-  "Illusionist / Wizard","Wizard","Runeblade","Draconic","Assassin","Brute",
-  "Guardian","Reviled Guardian","Mechanologist","Pirate Mechanologist","Pirate Ranger",
-  "Ranger","Generic","Token / Macro","Unrevealed",
+  "Illusionist / Wizard","Illusionist","Wizard","Runeblade","Draconic",
+  "Assassin","Brute","Guardian","Guardian / Warrior","Reviled Guardian",
+  "Mechanologist","Ninja","Pirate Mechanologist","Pirate Ranger","Pirate Necromancer",
+  "Ranger","Warrior","Light","Chaos","Generic","Token / Macro","Basic","Unrevealed",
 ];
 
 const HEROES = [
-  { id:"h1", name:"Aurora",          img:SCG+"04/2e1a3d31-aurora.webp",  cls:"Lightning Runeblade"   },
-  { id:"h2", name:"Oscilio",         img:SCG+"04/0204988f-oscilio.webp", cls:"Lightning Wizard"      },
-  { id:"h3", name:"Zyggy Starlight", img:SCG+"04/599fcee0-zyggy.webp",  cls:"Lightning Illusionist" },
+  { id:"OMN047", name:"Aurora, Legacy of Tempest",      img:LSS+"OMN047.webp", cls:"Lightning Runeblade"   },
+  { id:"OMN094", name:"Oscilio, Forked Continuum",       img:LSS+"OMN094.webp", cls:"Lightning Wizard"      },
+  { id:"OMN001", name:"Zyggy Starlight",                 img:LSS+"OMN001.webp", cls:"Lightning Illusionist" },
 ];
 
-// Pre-release kit promo pack — exact contents as announced
+// Pre-release promo pack — 12 cards (4 CF equipment, 1 MV GTS, 3 heroes, 3 weapons, 1 macro)
+// Distributor lists as 10 because some are double-sided; we print each face separately
 const PROMO_PACK = [
-  // Hero cards
-  { id:"pr-h1", name:"Aurora, Emissary of Lightning",  rarity:"M", img:SCG+"04/2e1a3d31-aurora.webp",                          type:"Lightning Runeblade Hero"   },
-  { id:"pr-h2", name:"Oscilio, Scion of the Third Age",rarity:"M", img:SCG+"04/0204988f-oscilio.webp",                         type:"Lightning Wizard Hero"      },
-  { id:"pr-h3", name:"Zyggy",                          rarity:"M", img:SCG+"04/599fcee0-zyggy.webp",                           type:"Lightning Illusionist Hero" },
-  // Signature weapons
-  { id:"pr-m3", name:"Scorpio, Comet Tail",            rarity:"M", img:SCG+"04/4094afd0-scorpio.webp",                         type:"Lightning Runeblade Weapon" },
-  { id:"pr-m5", name:"Volzar, Meteor Storm",           rarity:"M", img:SCG+"04/120447cf-volzar.webp",                          type:"Lightning Wizard Weapon"    },
-  { id:"pr-m6", name:"Aphrodias",                      rarity:"M", img:SCG+"04/c1e37f61-aphrodias.webp",                       type:"Lightning Illusionist Weapon"},
-  // Astral Sanctuary equipment set
-  { id:"pr-r16", name:"Helm of Astral Sanctuary",      rarity:"R", img:SCG+"05/9ba16fe6-helm-of-astral-sanctuary.webp",        type:"Equipment — Head"  },
-  { id:"pr-r17", name:"Robe of Astral Sanctuary",      rarity:"R", img:SCG+"05/9ba16fe6-robe-of-astral-sanctuary.webp",        type:"Equipment — Chest" },
-  { id:"pr-r15", name:"Gloves of Astral Sanctuary",    rarity:"R", img:SCG+"05/2a88d2f0-gloves-of-astral-sanctuary.webp",      type:"Equipment — Arms"  },
-  { id:"pr-r14", name:"Boots of Astral Sanctuary",     rarity:"R", img:SCG+"05/2a88d2f0-boots-of-astral-sanctuary.webp",       type:"Equipment — Legs"  },
-  // Commons (all three pitches)
-  { id:"pr-c4",  name:"Glide Through Starlight (1)",   rarity:"C", img:SCG+"05/c4e8e688-glide-through-starlight-r.webp",       type:"Lightning Action", pitch:1 },
-  { id:"pr-c5",  name:"Glide Through Starlight (2)",   rarity:"C", img:SCG+"05/c4e8e688-glide-through-starlight-y.webp",       type:"Lightning Action", pitch:2 },
-  { id:"pr-c6",  name:"Glide Through Starlight (3)",   rarity:"C", img:SCG+"05/c4e8e688-glide-through-starlight-b.webp",       type:"Lightning Action", pitch:3 },
-  // Macro
-  { id:"pr-t4",  name:"Omens of Arcana",               rarity:"T", img:SCG+"04/6d6f6837-omens-of-arcana-383x535.webp",         type:"Macro" },
+  { id:"pr-h1", name:"Aurora, Emissary of Lightning",  rarity:"B", img:LSS+"OMN048.webp", type:"Lightning Runeblade Hero - Young"   },
+  { id:"pr-h2", name:"Oscilio, Scion of the Third Age",rarity:"B", img:LSS+"OMN095.webp", type:"Lightning Wizard Hero - Young"      },
+  { id:"pr-h3", name:"Zyggy",                          rarity:"B", img:LSS+"OMN002.webp", type:"Lightning Illusionist Hero - Young" },
+  { id:"pr-w1", name:"Scorpio, Comet Tail",            rarity:"B", img:LSS+"OMN049.webp", type:"Lightning Runeblade Weapon - Sword (2H)" },
+  { id:"pr-w2", name:"Volzar, Meteor Storm",           rarity:"B", img:LSS+"OMN096.webp", type:"Lightning Wizard Weapon - Staff (2H)" },
+  { id:"pr-w3", name:"Aphrodias",                      rarity:"B", img:LSS+"OMN003.webp", type:"Lightning Illusionist Weapon - Orb (2H)" },
+  { id:"pr-e1", name:"Helm of Astral Sanctuary",       rarity:"C", img:LSS+"OMN209.webp", type:"Generic Equipment - Head"   },
+  { id:"pr-e2", name:"Robe of Astral Sanctuary",       rarity:"C", img:LSS+"OMN210.webp", type:"Generic Equipment - Chest"  },
+  { id:"pr-e3", name:"Gloves of Astral Sanctuary",     rarity:"C", img:LSS+"OMN211.webp", type:"Generic Equipment - Arms"   },
+  { id:"pr-e4", name:"Boots of Astral Sanctuary",      rarity:"C", img:LSS+"OMN212.webp", type:"Generic Equipment - Legs"   },
+  { id:"pr-c1", name:"Glide Through Starlight (1)",    rarity:"C", img:LSS+"OMN169.webp", type:"Lightning Action - Attack",  pitch:1 },
+  { id:"pr-t1", name:"Omens of Arcana",                rarity:"B", img:LSS+"OMN227.webp", type:"Omens of the Third Age Macro" },
 ];
 
+// ── Full OTA card list — sourced from @flesh-and-blood/cards npm package ──────
+// All 251 cards, correct rarities. No placeholders needed.
 const REVEALED = [
-  {id:"t1",name:"Lightning Flow",         rarity:"T",img:SCG+"04/8eb6058c-lightning-flow.webp",               type:"Token"},
-  {id:"t2",name:"Embodiment of Lightning",rarity:"T",img:SCG+"04/88681f60-embodiment-of-lightning.webp",      type:"Token"},
-  {id:"t3",name:"Ponder",                 rarity:"T",img:SCG+"04/8eb6058c-ponder.webp",                       type:"Token"},
-  {id:"t4",name:"Omens of Arcana",        rarity:"T",img:SCG+"04/6d6f6837-omens-of-arcana-383x535.webp",      type:"Macro"},
-  {id:"c1", name:"Rift Breaker (1)",            rarity:"C",img:SCG+"04/9ad76246-rift-breaker-r.webp",           type:"Lightning Attack Action",pitch:1},
-  {id:"c2", name:"Rift Breaker (2)",            rarity:"C",img:SCG+"04/1d4661ee-rift-breaker-y.webp",           type:"Lightning Attack Action",pitch:2},
-  {id:"c3", name:"Rift Breaker (3)",            rarity:"C",img:SCG+"04/9ad76246-rift-breaker-b.webp",           type:"Lightning Attack Action",pitch:3},
-  {id:"c4", name:"Glide Through Starlight (1)", rarity:"C",img:SCG+"05/c4e8e688-glide-through-starlight-r.webp",type:"Lightning Action",pitch:1},
-  {id:"c5", name:"Glide Through Starlight (2)", rarity:"C",img:SCG+"05/c4e8e688-glide-through-starlight-y.webp",type:"Lightning Action",pitch:2},
-  {id:"c6", name:"Glide Through Starlight (3)", rarity:"C",img:SCG+"05/c4e8e688-glide-through-starlight-b.webp",type:"Lightning Action",pitch:3},
-  {id:"c7", name:"Voltbound Duality (1)", rarity:"C",img:SCG+"04/3d890cd2-voltbound-duality-r.webp",  type:"Lightning Runeblade Attack Action",pitch:1},
-  {id:"c8", name:"Voltbound Duality (2)", rarity:"C",img:SCG+"04/3d890cd2-voltbound-duality-y.webp",  type:"Lightning Runeblade Attack Action",pitch:2},
-  {id:"c9", name:"Voltbound Duality (3)", rarity:"C",img:SCG+"04/3d890cd2-voltbound-duality-b.webp",  type:"Lightning Runeblade Attack Action",pitch:3},
-  {id:"c10",name:"Mercurial Skies (1)",   rarity:"C",img:SCG+"04/69f84da2-mercurial-skies-r.webp",   type:"Lightning Runeblade Action",pitch:1},
-  {id:"c11",name:"Mercurial Skies (2)",   rarity:"C",img:SCG+"04/69f84da2-mercurial-skies-y.webp",   type:"Lightning Runeblade Action",pitch:2},
-  {id:"c12",name:"Mercurial Skies (3)",   rarity:"C",img:SCG+"04/69f84da2-mercurial-skies-u.webp",   type:"Lightning Runeblade Action",pitch:3},
-  {id:"c13",name:"Arc Ramp (1)",      rarity:"C",img:SCG+"04/ff6eb6cc-arc-ramp-r.webp",              type:"Lightning Wizard Attack Action",pitch:1},
-  {id:"c14",name:"Arc Ramp (2)",      rarity:"C",img:SCG+"04/ff6eb6cc-arc-ramp-y.webp",              type:"Lightning Wizard Attack Action",pitch:2},
-  {id:"c15",name:"Arc Ramp (3)",      rarity:"C",img:SCG+"04/ff6eb6cc-arc-ramp-b.webp",              type:"Lightning Wizard Attack Action",pitch:3},
-  {id:"c16",name:"Core Reaction (1)", rarity:"C",img:SCG+"04/6deeccd2-core-reaction-r.webp",         type:"Lightning Wizard Instant",pitch:1},
-  {id:"c17",name:"Core Reaction (2)", rarity:"C",img:SCG+"04/6deeccd2-core-reaction-y.webp",         type:"Lightning Wizard Instant",pitch:2},
-  {id:"c18",name:"Core Reaction (3)", rarity:"C",img:SCG+"04/6deeccd2-core-reaction-b.webp",         type:"Lightning Wizard Instant",pitch:3},
-  {id:"c19",name:"Cosmic Suture (1)", rarity:"C",img:SCG+"04/441d2031-cosmic-suture-r.webp",         type:"Lightning Wizard Attack Action",pitch:1},
-  {id:"c20",name:"Cosmic Suture (2)", rarity:"C",img:SCG+"04/441d2031-cosmic-suture-y.webp",         type:"Lightning Wizard Attack Action",pitch:2},
-  {id:"c21",name:"Cosmic Suture (3)", rarity:"C",img:SCG+"04/441d2031-cosmic-suture-b.webp",         type:"Lightning Wizard Attack Action",pitch:3},
-  {id:"c22",name:"Nebula Duality (1)",rarity:"C",img:SCG+"04/553e232c-nebula-duality-r.webp",        type:"Lightning Wizard Attack Action",pitch:1},
-  {id:"c23",name:"Nebula Duality (2)",rarity:"C",img:SCG+"04/6000a797-nebula-duality-y.webp",        type:"Lightning Wizard Attack Action",pitch:2},
-  {id:"c24",name:"Nebula Duality (3)",rarity:"C",img:SCG+"04/6000a797-nebula-duality-b.webp",        type:"Lightning Wizard Attack Action",pitch:3},
-  {id:"c25",name:"Auric Shards (1)",        rarity:"C",img:SCG+"04/5110994a-auric-shards-r.webp",              type:"Lightning Illusionist Attack Action",pitch:1},
-  {id:"c26",name:"Auric Shards (2)",        rarity:"C",img:SCG+"04/5110994a-auric-shards-y.webp",              type:"Lightning Illusionist Attack Action",pitch:2},
-  {id:"c27",name:"Auric Shards (3)",        rarity:"C",img:SCG+"04/5110994a-auric-shards-b.webp",              type:"Lightning Illusionist Attack Action",pitch:3},
-  {id:"c28",name:"Cosmic Duality (1)",      rarity:"C",img:SCG+"04/85fa7fc2-cosmic-duality-r.webp",            type:"Lightning Illusionist Action",pitch:1},
-  {id:"c29",name:"Cosmic Duality (2)",      rarity:"C",img:SCG+"04/85fa7fc2-cosmic-duality-y.webp",            type:"Lightning Illusionist Action",pitch:2},
-  {id:"c30",name:"Cosmic Duality (3)",      rarity:"C",img:SCG+"04/a70cce47-cosmic-duality-b.webp",            type:"Lightning Illusionist Action",pitch:3},
-  {id:"c31",name:"Pulsing Cardia (1)",      rarity:"C",img:SCG+"04/51e8c87d-pulsing-cardia-r.webp",            type:"Lightning Illusionist Attack Action",pitch:1},
-  {id:"c32",name:"Pulsing Cardia (2)",      rarity:"C",img:SCG+"04/51e8c87d-pulsing-cardia-y.webp",            type:"Lightning Illusionist Attack Action",pitch:2},
-  {id:"c33",name:"Pulsing Cardia (3)",      rarity:"C",img:SCG+"04/51e8c87d-pulsing-cardia-b.webp",            type:"Lightning Illusionist Attack Action",pitch:3},
-  {id:"c34",name:"Corrosive Space Dust (1)",rarity:"C",img:SCG+"05/bb594bcc-corrosive-space-dust-r.webp",      type:"Lightning Illusionist Action",pitch:1},
-  {id:"c35",name:"Corrosive Space Dust (2)",rarity:"C",img:SCG+"05/bb594bcc-corrosive-space-dust-y.webp",      type:"Lightning Illusionist Action",pitch:2},
-  {id:"c36",name:"Corrosive Space Dust (3)",rarity:"C",img:SCG+"05/bb594bcc-corrosive-space-dust-b.webp",      type:"Lightning Illusionist Action",pitch:3},
-  {id:"c37",name:"Unmake the Underlings",rarity:"C",img:SCG+"05/36a6e6a9-unmake-the-underlings-383x535.webp", type:"Assassin Action"},
-  {id:"c38",name:"Feral Instinct",       rarity:"C",img:SCG+"05/f4f75dd3-feral-instinct-383x535.webp",       type:"Brute Action"},
-  {id:"c39",name:"Gear Turner",          rarity:"C",img:SCG+"05/58ed9de3-gear-turner-383x535.webp",          type:"Mechanologist Action"},
-  {id:"c40",name:"Crash Site Salvage",   rarity:"C",img:SCG+"05/f1f1c974-crash-site-salvage-383x535.webp",   type:"Pirate Mechanologist Action"},
-  {id:"c41",name:"Pile Driver",          rarity:"C",img:SCG+"05/4988a2b7-pile-driver-383x535.webp",          type:"Guardian Action"},
-  {id:"c42",name:"Ominous Aggression",   rarity:"C",img:SCG+"05/25cb9fd8-ominous-aggression.webp",           type:"Generic Action"},
-  {id:"c43",name:"Step Between",         rarity:"C",img:SCG+"05/25cb9fd8-step-between.webp",                 type:"Generic Action"},
-  {id:"c44",name:"Boots",                rarity:"C",img:SCG+"05/25cb9fd8-boots.webp",                        type:"Generic Equipment — Legs"},
-  {id:"r1", name:"Astral Strike",              rarity:"R",img:SCG+"04/9825fda0-astral-strike.webp",              type:"Lightning Action"},
-  {id:"r2", name:"Flowing Strike",             rarity:"R",img:SCG+"04/9825fda0-flowing-strike.webp",             type:"Lightning Attack Action"},
-  {id:"r3", name:"Voltic Impact",              rarity:"R",img:SCG+"04/1e95d39b-voltic-impact.webp",              type:"Lightning Attack Action"},
-  {id:"r4", name:"Beckoning Brilliance",       rarity:"R",img:SCG+"04/12d6b399-beckoning-brilliance.webp",       type:"Lightning Action"},
-  {id:"r5", name:"Static Shelter",             rarity:"R",img:SCG+"04/12d6b399-static-shelter.webp",            type:"Lightning Defensive Reaction"},
-  {id:"r6", name:"Dashing Flashfoot",          rarity:"R",img:SCG+"04/4094afd0-dashing-flashfoot.webp",         type:"Lightning Runeblade Equipment — Legs"},
-  {id:"r7", name:"Arcanic Reproach",           rarity:"R",img:SCG+"05/de508f51-arcanic-reproach.webp",          type:"Lightning Runeblade Attack Action"},
-  {id:"r8", name:"Prophetic Quickstep",        rarity:"R",img:SCG+"05/de508f51-prophetic-quickstep.webp",       type:"Lightning Runeblade Action"},
-  {id:"r9", name:"Echoflash",                  rarity:"R",img:SCG+"04/120447cf-echoflash.webp",                 type:"Lightning Wizard Instant"},
-  {id:"r10",name:"Blink of an Eye",            rarity:"R",img:SCG+"04/921c9f8e-blink-of-an-eye.webp",          type:"Lightning Illusionist Action"},
-  {id:"r11",name:"Circular Flowtide",          rarity:"R",img:SCG+"04/921c9f8e-circular-flowtide.webp",        type:"Lightning Illusionist Attack Action"},
-  {id:"r12",name:"Turn to Mindfire",           rarity:"R",img:SCG+"05/aac8c493-turn-to-mindfire.webp",         type:"Wizard Action"},
-  {id:"r13",name:"Red Lure Harpoon",           rarity:"R",img:SCG+"05/43ea4ed5-red-lure-harpoon-383x535.webp", type:"Pirate Ranger Weapon"},
-  {id:"r14",name:"Boots of Astral Sanctuary",  rarity:"R",img:SCG+"05/2a88d2f0-boots-of-astral-sanctuary.webp",type:"Equipment — Legs"},
-  {id:"r15",name:"Gloves of Astral Sanctuary", rarity:"R",img:SCG+"05/2a88d2f0-gloves-of-astral-sanctuary.webp",type:"Equipment — Arms"},
-  {id:"r16",name:"Helm of Astral Sanctuary",   rarity:"R",img:SCG+"05/9ba16fe6-helm-of-astral-sanctuary.webp", type:"Equipment — Head"},
-  {id:"r17",name:"Robe of Astral Sanctuary",   rarity:"R",img:SCG+"05/9ba16fe6-robe-of-astral-sanctuary.webp", type:"Equipment — Chest"},
-  {id:"m1", name:"Flowstate Embodiment",    rarity:"M",img:SCG+"04/9825fda0-flowstate-embodiment.webp",              type:"Lightning Action"},
-  {id:"m2", name:"Meteoric Rise",           rarity:"M",img:SCG+"04/1e95d39b-meteoric-rise.webp",                     type:"Lightning Action"},
-  {id:"m3", name:"Scorpio",                 rarity:"M",img:SCG+"04/4094afd0-scorpio.webp",                           type:"Lightning Runeblade Weapon — Sword"},
-  {id:"m4", name:"Tempestuous Kiss",        rarity:"M",img:SCG+"04/3cbec7db-tempestuous-kiss.webp",                  type:"Lightning Runeblade Action"},
-  {id:"m5", name:"Volzar",                  rarity:"M",img:SCG+"04/120447cf-volzar.webp",                            type:"Lightning Wizard Weapon — Staff"},
-  {id:"m6", name:"Aphrodias",               rarity:"M",img:SCG+"04/c1e37f61-aphrodias.webp",                         type:"Lightning Illusionist Weapon"},
-  {id:"m7", name:"Unwinding Finality",      rarity:"M",img:SCG+"05/7d99acd4-undwinding-finality.webp",              type:"Lightning Illusionist Action"},
-  {id:"m8", name:"Flicker Reality",         rarity:"M",img:SCG+"04/921c9f8e-flicker-reality.webp",                  type:"Lightning Illusionist Action"},
-  {id:"m9", name:"Third Eye of the Sphinx", rarity:"M",img:SCG+"05/2363ff83-third-eye-of-the-sphinx-383x535.webp",  type:"Illusionist Wizard Action"},
-  {id:"m10",name:"Lionclaw Maul",           rarity:"M",img:SCG+"05/0fbc753e-lionclaw-maul-383x535.webp",            type:"Reviled Guardian Weapon — Maul"},
-  {id:"m11",name:"Tome of Quandaries",      rarity:"M",img:SCG+"05/aac8c493-tome-of-quandaries.webp",               type:"Wizard Equipment — Off-Hand"},
-  {id:"l1", name:"Stormshard",rarity:"L",img:SCG+"03/dfa65a69-stormshard.png",type:"Lightning Action"},
-
-  // ── Newly revealed (May 13 2026 update) ─────────────────────────────────────
-  // Lightning
-  {id:"n1", name:"Flowshard Elemental",    rarity:"M", img:SCG+"05/4c94b2cf-flowshard-elemental.webp",                  type:"Lightning Action"},
-  {id:"n2", name:"Cosmic Flare",           rarity:"R", img:SCG+"05/b65a01fd-cosmic-flare.webp",                          type:"Lightning Action"},
-  {id:"n3", name:"Livewire Press",         rarity:"R", img:SCG+"05/037c074c-livewire-press.webp",                        type:"Lightning Action"},
-  // Runeblade
-  {id:"n4", name:"Gauntlet of Sword and Sorcery", rarity:"R", img:SCG+"05/475c63bd-gauntlet-of-sword-and-sorcery-383x535.webp", type:"Runeblade Equipment"},
-  // Guardian / Warrior
-  {id:"n5", name:"A Bit Off the Side",     rarity:"C", img:SCG+"05/6ee5cf04-a-bit-off-the-side-383x535.webp",            type:"Guardian Warrior Action"},
-  // Ranger
-  {id:"n6", name:"Settle the Bill",        rarity:"C", img:SCG+"05/8ba62b83-settle-the-bill-383x535.webp",               type:"Ranger Action"},
-  // Ninja
-  {id:"n7", name:"Evasive Nageboshi",      rarity:"R", img:SCG+"05/c8b89ab0-evasive-nageboshi.webp",                     type:"Ninja Equipment — Off-Hand"},
-  {id:"n8", name:"Razor Ring",             rarity:"C", img:SCG+"05/c8b89ab0-razor-ring.webp",                            type:"Ninja Weapon"},
-  {id:"n9", name:"Stun Star",              rarity:"C", img:SCG+"05/c8b89ab0-stun-star.webp",                             type:"Ninja Equipment"},
-  // Light
-  {id:"n10",name:"Blessing of Aegis",      rarity:"R", img:SCG+"05/95a486fd-blessing-of-aegis-383x535.webp",             type:"Light Action"},
-  // Generic
-  {id:"n11",name:"Browbeat",               rarity:"C", img:SCG+"05/e509ac2f-browbeat.webp",                              type:"Generic Action"},
-  {id:"n12",name:"Ominous Excavation",     rarity:"C", img:SCG+"05/042f4090-ominous-excavation.webp",                    type:"Generic Action"},
-  {id:"n13",name:"Ominous Respite",        rarity:"R", img:SCG+"05/1033e291-ominous-respite-383x535.webp",               type:"Generic Instant", pitch:2},
-
-  // ── Calling Rotterdam reveal ─────────────────────────────────────────────
-  {id:"n14",name:"Boots of Omnis Ward",    rarity:"R", img:LSS+"OMN204-RF.webp",                                       type:"Generic Equipment — Legs"},
-
-  // ── World Premiere / Fabrary revealed tab ────────────────────────────────
-  // Runeblade (non-Lightning)
-  {id:"n15",name:"Caress of the Reaper",   rarity:"M", img:LSS+"OMN087.webp",  type:"Runeblade Attack Action", pitch:1},
-  {id:"n16",name:"Arcanic Cunning (1)",    rarity:"R", img:LSS+"OMN088.webp",  type:"Runeblade Attack Action", pitch:1},
-  {id:"n17",name:"Arcanic Cunning (2)",    rarity:"R", img:LSS+"OMN089.webp",  type:"Runeblade Attack Action", pitch:2},
-  {id:"n18",name:"Arcanic Cunning (3)",    rarity:"R", img:LSS+"OMN090.webp",  type:"Runeblade Attack Action", pitch:3},
-  // Draconic
-  {id:"n19",name:"Draco Fire",             rarity:"M", img:LSS+"OMN245.webp",  type:"Draconic Instant",        pitch:1},
-  // Ranger (Majestic upgrade of existing Common)
-  {id:"n20",name:"Settle the Bill (2)",    rarity:"M", img:LSS+"OMN237.webp",  type:"Ranger Action",           pitch:2},
-  // Generic Rare
-  {id:"n21",name:"Ominous Respite (1)",    rarity:"R", img:LSS+"OMN216.webp",  type:"Generic Instant",         pitch:1},
-  {id:"n22",name:"Ominous Respite (3)",    rarity:"R", img:LSS+"OMN219.webp",  type:"Generic Instant",         pitch:3},
+  {id:"OMN000",name:"Voltaris (3)",rarity:"F",img:LSS+"OMN000.webp",type:"Lightning Resource - Gem",pitch:3},
+  {id:"OMN001",name:"Zyggy Starlight",rarity:"B",img:LSS+"OMN001.webp",type:"Lightning Illusionist Hero"},
+  {id:"OMN002",name:"Zyggy",rarity:"B",img:LSS+"OMN002.webp",type:"Lightning Illusionist Hero - Young"},
+  {id:"OMN003",name:"Aphrodias",rarity:"B",img:LSS+"OMN003.webp",type:"Lightning Illusionist Weapon - Orb (2H)"},
+  {id:"OMN004",name:"Unwinding Finality (1)",rarity:"M",img:LSS+"OMN004.webp",type:"Lightning Illusionist Action - Attack",pitch:1},
+  {id:"OMN005",name:"Flicker Reality (3)",rarity:"M",img:LSS+"OMN005.webp",type:"Lightning Illusionist Instant - Aura",pitch:3},
+  {id:"OMN006",name:"Blink of an Eye (1)",rarity:"R",img:LSS+"OMN006.webp",type:"Lightning Illusionist Action - Attack",pitch:1},
+  {id:"OMN007",name:"Fraying Lifeforce (1)",rarity:"R",img:LSS+"OMN007.webp",type:"Lightning Illusionist Action - Attack",pitch:1},
+  {id:"OMN008",name:"Scattering Conflux (1)",rarity:"R",img:LSS+"OMN008.webp",type:"Lightning Illusionist Action - Attack",pitch:1},
+  {id:"OMN009",name:"Polarus Pulse Ray (1)",rarity:"R",img:LSS+"OMN009.webp",type:"Lightning Illusionist Action - Attack",pitch:1},
+  {id:"OMN010",name:"Polarus Pulse Ray (2)",rarity:"R",img:LSS+"OMN010.webp",type:"Lightning Illusionist Action - Attack",pitch:2},
+  {id:"OMN011",name:"Polarus Pulse Ray (3)",rarity:"R",img:LSS+"OMN011.webp",type:"Lightning Illusionist Action - Attack",pitch:3},
+  {id:"OMN012",name:"Corrosive Space Dust (1)",rarity:"R",img:LSS+"OMN012.webp",type:"Lightning Illusionist Instant - Aura",pitch:1},
+  {id:"OMN013",name:"Corrosive Space Dust (2)",rarity:"R",img:LSS+"OMN013.webp",type:"Lightning Illusionist Instant - Aura",pitch:2},
+  {id:"OMN014",name:"Corrosive Space Dust (3)",rarity:"R",img:LSS+"OMN014.webp",type:"Lightning Illusionist Instant - Aura",pitch:3},
+  {id:"OMN015",name:"Cosmic Duality (1)",rarity:"C",img:LSS+"OMN015.webp",type:"Lightning Illusionist Action - Attack",pitch:1},
+  {id:"OMN016",name:"Cosmic Duality (2)",rarity:"C",img:LSS+"OMN016.webp",type:"Lightning Illusionist Action - Attack",pitch:2},
+  {id:"OMN017",name:"Cosmic Duality (3)",rarity:"C",img:LSS+"OMN017.webp",type:"Lightning Illusionist Action - Attack",pitch:3},
+  {id:"OMN018",name:"Ebbing Arcstride (1)",rarity:"C",img:LSS+"OMN018.webp",type:"Lightning Illusionist Action - Attack",pitch:1},
+  {id:"OMN019",name:"Ebbing Arcstride (2)",rarity:"C",img:LSS+"OMN019.webp",type:"Lightning Illusionist Action - Attack",pitch:2},
+  {id:"OMN020",name:"Ebbing Arcstride (3)",rarity:"C",img:LSS+"OMN020.webp",type:"Lightning Illusionist Action - Attack",pitch:3},
+  {id:"OMN021",name:"Pulsing Cardia (1)",rarity:"C",img:LSS+"OMN021.webp",type:"Lightning Illusionist Action - Attack",pitch:1},
+  {id:"OMN022",name:"Pulsing Cardia (2)",rarity:"C",img:LSS+"OMN022.webp",type:"Lightning Illusionist Action - Attack",pitch:2},
+  {id:"OMN023",name:"Pulsing Cardia (3)",rarity:"C",img:LSS+"OMN023.webp",type:"Lightning Illusionist Action - Attack",pitch:3},
+  {id:"OMN024",name:"Shattering Flowtide (1)",rarity:"C",img:LSS+"OMN024.webp",type:"Lightning Illusionist Action - Attack",pitch:1},
+  {id:"OMN025",name:"Shattering Flowtide (2)",rarity:"C",img:LSS+"OMN025.webp",type:"Lightning Illusionist Action - Attack",pitch:2},
+  {id:"OMN026",name:"Shattering Flowtide (3)",rarity:"C",img:LSS+"OMN026.webp",type:"Lightning Illusionist Action - Attack",pitch:3},
+  {id:"OMN027",name:"Auric Shards (1)",rarity:"C",img:LSS+"OMN027.webp",type:"Lightning Illusionist Instant - Aura",pitch:1},
+  {id:"OMN028",name:"Auric Shards (2)",rarity:"C",img:LSS+"OMN028.webp",type:"Lightning Illusionist Instant - Aura",pitch:2},
+  {id:"OMN029",name:"Auric Shards (3)",rarity:"C",img:LSS+"OMN029.webp",type:"Lightning Illusionist Instant - Aura",pitch:3},
+  {id:"OMN030",name:"Holo Shield (1)",rarity:"C",img:LSS+"OMN030.webp",type:"Lightning Illusionist Instant - Aura",pitch:1},
+  {id:"OMN031",name:"Holo Shield (2)",rarity:"C",img:LSS+"OMN031.webp",type:"Lightning Illusionist Instant - Aura",pitch:2},
+  {id:"OMN032",name:"Holo Shield (3)",rarity:"C",img:LSS+"OMN032.webp",type:"Lightning Illusionist Instant - Aura",pitch:3},
+  {id:"OMN033",name:"Circular Flowtide (2)",rarity:"C",img:LSS+"OMN033.webp",type:"Lightning Illusionist Instant - Aura",pitch:2},
+  {id:"OMN034",name:"Elliptical Conflux (2)",rarity:"C",img:LSS+"OMN034.webp",type:"Lightning Illusionist Instant - Aura",pitch:2},
+  {id:"OMN035",name:"Nebulus Cycle (2)",rarity:"C",img:LSS+"OMN035.webp",type:"Lightning Illusionist Instant - Aura",pitch:2},
+  {id:"OMN036",name:"Crackle from Afar (3)",rarity:"C",img:LSS+"OMN036.webp",type:"Lightning Illusionist Instant - Aura",pitch:3},
+  {id:"OMN037",name:"Fleeing Starbreeze (3)",rarity:"C",img:LSS+"OMN037.webp",type:"Lightning Illusionist Instant - Aura",pitch:3},
+  {id:"OMN038",name:"Nourishing Glow (3)",rarity:"C",img:LSS+"OMN038.webp",type:"Lightning Illusionist Instant - Aura",pitch:3},
+  {id:"OMN039",name:"Fingers of Fragmentation",rarity:"C",img:LSS+"OMN039.webp",type:"Illusionist Equipment - Arms"},
+  {id:"OMN040",name:"Fractal Creation (3)",rarity:"M",img:LSS+"OMN040.webp",type:"Illusionist Action - Attack",pitch:3},
+  {id:"OMN041",name:"Clear Conscience (1)",rarity:"R",img:LSS+"OMN041.webp",type:"Illusionist Action - Attack",pitch:1},
+  {id:"OMN042",name:"Clear Conscience (2)",rarity:"R",img:LSS+"OMN042.webp",type:"Illusionist Action - Attack",pitch:2},
+  {id:"OMN043",name:"Clear Conscience (3)",rarity:"R",img:LSS+"OMN043.webp",type:"Illusionist Action - Attack",pitch:3},
+  {id:"OMN044",name:"Erode Authority (1)",rarity:"R",img:LSS+"OMN044.webp",type:"Illusionist Action - Attack",pitch:1},
+  {id:"OMN045",name:"Erode Authority (2)",rarity:"R",img:LSS+"OMN045.webp",type:"Illusionist Action - Attack",pitch:2},
+  {id:"OMN046",name:"Erode Authority (3)",rarity:"R",img:LSS+"OMN046.webp",type:"Illusionist Action - Attack",pitch:3},
+  {id:"OMN047",name:"Aurora, Legacy of Tempest",rarity:"B",img:LSS+"OMN047.webp",type:"Lightning Runeblade Hero"},
+  {id:"OMN048",name:"Aurora, Emissary of Lightning",rarity:"B",img:LSS+"OMN048.webp",type:"Lightning Runeblade Hero - Young"},
+  {id:"OMN049",name:"Scorpio, Comet Tail",rarity:"B",img:LSS+"OMN049.webp",type:"Lightning Runeblade Weapon - Sword (2H)"},
+  {id:"OMN050",name:"Snap Fingers",rarity:"C",img:LSS+"OMN050.webp",type:"Lightning Runeblade Equipment - Arms"},
+  {id:"OMN051",name:"Tempestuous Kiss (1)",rarity:"M",img:LSS+"OMN051.webp",type:"Lightning Runeblade Action - Attack",pitch:1},
+  {id:"OMN052",name:"Arcanic Reproach (3)",rarity:"M",img:LSS+"OMN052.webp",type:"Lightning Runeblade Instant - Aura",pitch:3},
+  {id:"OMN053",name:"Dashing Flashfoot (2)",rarity:"R",img:LSS+"OMN053.webp",type:"Lightning Runeblade Action - Attack",pitch:2},
+  {id:"OMN054",name:"Electryn Mindmeld (2)",rarity:"R",img:LSS+"OMN054.webp",type:"Lightning Runeblade Action - Attack",pitch:2},
+  {id:"OMN055",name:"Prophetic Quickstep (2)",rarity:"R",img:LSS+"OMN055.webp",type:"Lightning Runeblade Action - Attack",pitch:2},
+  {id:"OMN056",name:"Stinging Sprite (1)",rarity:"R",img:LSS+"OMN056.webp",type:"Lightning Runeblade Action - Attack",pitch:1},
+  {id:"OMN057",name:"Stinging Sprite (2)",rarity:"R",img:LSS+"OMN057.webp",type:"Lightning Runeblade Action - Attack",pitch:2},
+  {id:"OMN058",name:"Stinging Sprite (3)",rarity:"R",img:LSS+"OMN058.webp",type:"Lightning Runeblade Action - Attack",pitch:3},
+  {id:"OMN059",name:"Mercurial Skies (1)",rarity:"R",img:LSS+"OMN059.webp",type:"Lightning Runeblade Action",pitch:1},
+  {id:"OMN060",name:"Mercurial Skies (2)",rarity:"R",img:LSS+"OMN060.webp",type:"Lightning Runeblade Action",pitch:2},
+  {id:"OMN061",name:"Mercurial Skies (3)",rarity:"R",img:LSS+"OMN061.webp",type:"Lightning Runeblade Action",pitch:3},
+  {id:"OMN062",name:"Destructive Fleetfoot (1)",rarity:"C",img:LSS+"OMN062.webp",type:"Lightning Runeblade Action - Attack",pitch:1},
+  {id:"OMN063",name:"Destructive Fleetfoot (2)",rarity:"C",img:LSS+"OMN063.webp",type:"Lightning Runeblade Action - Attack",pitch:2},
+  {id:"OMN064",name:"Destructive Fleetfoot (3)",rarity:"C",img:LSS+"OMN064.webp",type:"Lightning Runeblade Action - Attack",pitch:3},
+  {id:"OMN065",name:"Path of Same Ends (1)",rarity:"C",img:LSS+"OMN065.webp",type:"Lightning Runeblade Action - Attack",pitch:1},
+  {id:"OMN066",name:"Path of Same Ends (2)",rarity:"C",img:LSS+"OMN066.webp",type:"Lightning Runeblade Action - Attack",pitch:2},
+  {id:"OMN067",name:"Path of Same Ends (3)",rarity:"C",img:LSS+"OMN067.webp",type:"Lightning Runeblade Action - Attack",pitch:3},
+  {id:"OMN068",name:"Rush of Power (1)",rarity:"C",img:LSS+"OMN068.webp",type:"Lightning Runeblade Action - Attack",pitch:1},
+  {id:"OMN069",name:"Rush of Power (2)",rarity:"C",img:LSS+"OMN069.webp",type:"Lightning Runeblade Action - Attack",pitch:2},
+  {id:"OMN070",name:"Rush of Power (3)",rarity:"C",img:LSS+"OMN070.webp",type:"Lightning Runeblade Action - Attack",pitch:3},
+  {id:"OMN071",name:"Singeing Flowstride (1)",rarity:"C",img:LSS+"OMN071.webp",type:"Lightning Runeblade Action - Attack",pitch:1},
+  {id:"OMN072",name:"Singeing Flowstride (2)",rarity:"C",img:LSS+"OMN072.webp",type:"Lightning Runeblade Action - Attack",pitch:2},
+  {id:"OMN073",name:"Singeing Flowstride (3)",rarity:"C",img:LSS+"OMN073.webp",type:"Lightning Runeblade Action - Attack",pitch:3},
+  {id:"OMN074",name:"Stunning Swipe (1)",rarity:"C",img:LSS+"OMN074.webp",type:"Lightning Runeblade Action - Attack",pitch:1},
+  {id:"OMN075",name:"Stunning Swipe (2)",rarity:"C",img:LSS+"OMN075.webp",type:"Lightning Runeblade Action - Attack",pitch:2},
+  {id:"OMN076",name:"Stunning Swipe (3)",rarity:"C",img:LSS+"OMN076.webp",type:"Lightning Runeblade Action - Attack",pitch:3},
+  {id:"OMN077",name:"Voltbound Duality (1)",rarity:"C",img:LSS+"OMN077.webp",type:"Lightning Runeblade Action - Attack",pitch:1},
+  {id:"OMN078",name:"Voltbound Duality (2)",rarity:"C",img:LSS+"OMN078.webp",type:"Lightning Runeblade Action - Attack",pitch:2},
+  {id:"OMN079",name:"Voltbound Duality (3)",rarity:"C",img:LSS+"OMN079.webp",type:"Lightning Runeblade Action - Attack",pitch:3},
+  {id:"OMN080",name:"Electryn Joltstep (1)",rarity:"C",img:LSS+"OMN080.webp",type:"Lightning Runelbade Action",pitch:1},
+  {id:"OMN081",name:"Electryn Joltstep (2)",rarity:"C",img:LSS+"OMN081.webp",type:"Lightning Runelbade Action",pitch:2},
+  {id:"OMN082",name:"Electryn Joltstep (3)",rarity:"C",img:LSS+"OMN082.webp",type:"Lightning Runelbade Action",pitch:3},
+  {id:"OMN083",name:"Quick Succession (1)",rarity:"C",img:LSS+"OMN083.webp",type:"Lightning Runelbade Action",pitch:1},
+  {id:"OMN084",name:"Quick Succession (2)",rarity:"C",img:LSS+"OMN084.webp",type:"Lightning Runelbade Action",pitch:2},
+  {id:"OMN085",name:"Quick Succession (3)",rarity:"C",img:LSS+"OMN085.webp",type:"Lightning Runelbade Action",pitch:3},
+  {id:"OMN086",name:"Gauntlet of Sword and Sorcery",rarity:"L",img:LSS+"OMN086.webp",type:"Runeblade Equipment - Arms"},
+  {id:"OMN087",name:"Caress of the Reaper (1)",rarity:"M",img:LSS+"OMN087.webp",type:"Runeblade Action - Attack",pitch:1},
+  {id:"OMN088",name:"Arcanic Cunning (1)",rarity:"R",img:LSS+"OMN088.webp",type:"Runeblade Action - Attack",pitch:1},
+  {id:"OMN089",name:"Arcanic Cunning (2)",rarity:"R",img:LSS+"OMN089.webp",type:"Runeblade Action - Attack",pitch:2},
+  {id:"OMN090",name:"Arcanic Cunning (3)",rarity:"R",img:LSS+"OMN090.webp",type:"Runeblade Action - Attack",pitch:3},
+  {id:"OMN091",name:"Leech Memory (1)",rarity:"R",img:LSS+"OMN091.webp",type:"Runeblade Action",pitch:1},
+  {id:"OMN092",name:"Leech Renown (1)",rarity:"R",img:LSS+"OMN092.webp",type:"Runeblade Action",pitch:1},
+  {id:"OMN093",name:"Leech Vitality (1)",rarity:"R",img:LSS+"OMN093.webp",type:"Runeblade Action",pitch:1},
+  {id:"OMN094",name:"Oscilio, Forked Continuum",rarity:"B",img:LSS+"OMN094.webp",type:"Lightning Wizard Hero"},
+  {id:"OMN095",name:"Oscilio, Scion of the Third Age",rarity:"B",img:LSS+"OMN095.webp",type:"Lightning Wizard Hero - Young"},
+  {id:"OMN096",name:"Volzar, Meteor Storm",rarity:"B",img:LSS+"OMN096.webp",type:"Lightning Wizard Weapon - Staff (2H)"},
+  {id:"OMN097",name:"Constella Waves",rarity:"C",img:LSS+"OMN097.webp",type:"Lightning Wizard Equipment - Arms"},
+  {id:"OMN098",name:"Astral Bridge (1)",rarity:"M",img:LSS+"OMN098.webp",type:"Lightning Wizard Instant",pitch:1},
+  {id:"OMN099",name:"Echoflash (2)",rarity:"M",img:LSS+"OMN099.webp",type:"Lightning Wizard Instant",pitch:2},
+  {id:"OMN100",name:"Arc Ramp (1)",rarity:"R",img:LSS+"OMN100.webp",type:"Lightning Wizard Action",pitch:1},
+  {id:"OMN101",name:"Arc Ramp (2)",rarity:"R",img:LSS+"OMN101.webp",type:"Lightning Wizard Action",pitch:2},
+  {id:"OMN102",name:"Arc Ramp (3)",rarity:"R",img:LSS+"OMN102.webp",type:"Lightning Wizard Action",pitch:3},
+  {id:"OMN103",name:"Core Reaction (1)",rarity:"R",img:LSS+"OMN103.webp",type:"Lightning Wizard Instant - Aura",pitch:1},
+  {id:"OMN104",name:"Core Reaction (2)",rarity:"R",img:LSS+"OMN104.webp",type:"Lightning Wizard Instant - Aura",pitch:2},
+  {id:"OMN105",name:"Core Reaction (3)",rarity:"R",img:LSS+"OMN105.webp",type:"Lightning Wizard Instant - Aura",pitch:3},
+  {id:"OMN106",name:"Flash Bolt (1)",rarity:"R",img:LSS+"OMN106.webp",type:"Lightning Wizard Instant",pitch:1},
+  {id:"OMN107",name:"Flash Bolt (2)",rarity:"R",img:LSS+"OMN107.webp",type:"Lightning Wizard Instant",pitch:2},
+  {id:"OMN108",name:"Flash Bolt (3)",rarity:"R",img:LSS+"OMN108.webp",type:"Lightning Wizard Instant",pitch:3},
+  {id:"OMN109",name:"Comet Collision (1)",rarity:"R",img:LSS+"OMN109.webp",type:"Lightning Wizard Instant",pitch:1},
+  {id:"OMN110",name:"Comet Collision (2)",rarity:"R",img:LSS+"OMN110.webp",type:"Lightning Wizard Instant",pitch:2},
+  {id:"OMN111",name:"Comet Collision (3)",rarity:"R",img:LSS+"OMN111.webp",type:"Lightning Wizard Instant",pitch:3},
+  {id:"OMN112",name:"Enion Surge (1)",rarity:"C",img:LSS+"OMN112.webp",type:"Lightning Wizard Action",pitch:1},
+  {id:"OMN113",name:"Enion Surge (2)",rarity:"C",img:LSS+"OMN113.webp",type:"Lightning Wizard Action",pitch:2},
+  {id:"OMN114",name:"Enion Surge (3)",rarity:"C",img:LSS+"OMN114.webp",type:"Lightning Wizard Action",pitch:3},
+  {id:"OMN115",name:"Lightning Overload (1)",rarity:"C",img:LSS+"OMN115.webp",type:"Lightning Wizard Action",pitch:1},
+  {id:"OMN116",name:"Lightning Overload (2)",rarity:"C",img:LSS+"OMN116.webp",type:"Lightning Wizard Action",pitch:2},
+  {id:"OMN117",name:"Lightning Overload (3)",rarity:"C",img:LSS+"OMN117.webp",type:"Lightning Wizard Action",pitch:3},
+  {id:"OMN118",name:"Meteoric Impact (1)",rarity:"C",img:LSS+"OMN118.webp",type:"Lightning Wizard Action",pitch:1},
+  {id:"OMN119",name:"Meteoric Impact (2)",rarity:"C",img:LSS+"OMN119.webp",type:"Lightning Wizard Action",pitch:2},
+  {id:"OMN120",name:"Meteoric Impact (3)",rarity:"C",img:LSS+"OMN120.webp",type:"Lightning Wizard Action",pitch:3},
+  {id:"OMN121",name:"Nebula Duality (1)",rarity:"C",img:LSS+"OMN121.webp",type:"Lightning Wizard Action",pitch:1},
+  {id:"OMN122",name:"Nebula Duality (2)",rarity:"C",img:LSS+"OMN122.webp",type:"Lightning Wizard Action",pitch:2},
+  {id:"OMN123",name:"Nebula Duality (3)",rarity:"C",img:LSS+"OMN123.webp",type:"Lightning Wizard Action",pitch:3},
+  {id:"OMN124",name:"Tap Lessons Past (1)",rarity:"C",img:LSS+"OMN124.webp",type:"Lightning Wizard Action",pitch:1},
+  {id:"OMN125",name:"Tap Lessons Past (2)",rarity:"C",img:LSS+"OMN125.webp",type:"Lightning Wizard Action",pitch:2},
+  {id:"OMN126",name:"Tap Lessons Past (3)",rarity:"C",img:LSS+"OMN126.webp",type:"Lightning Wizard Action",pitch:3},
+  {id:"OMN127",name:"Cosmic Suture (1)",rarity:"C",img:LSS+"OMN127.webp",type:"Lightning Wizard Instant",pitch:1},
+  {id:"OMN128",name:"Cosmic Suture (2)",rarity:"C",img:LSS+"OMN128.webp",type:"Lightning Wizard Instant",pitch:2},
+  {id:"OMN129",name:"Cosmic Suture (3)",rarity:"C",img:LSS+"OMN129.webp",type:"Lightning Wizard Instant",pitch:3},
+  {id:"OMN130",name:"Constella Contemplation (2)",rarity:"C",img:LSS+"OMN130.webp",type:"Lightning Wizard Instant",pitch:2},
+  {id:"OMN131",name:"Constella Flowslide (2)",rarity:"C",img:LSS+"OMN131.webp",type:"Lightning Wizard Instant",pitch:2},
+  {id:"OMN132",name:"Constella Uplift (2)",rarity:"C",img:LSS+"OMN132.webp",type:"Lightning Wizard Instant",pitch:2},
+  {id:"OMN133",name:"Tome of Quandaries (3)",rarity:"M",img:LSS+"OMN133.webp",type:"Wizard Instant",pitch:3},
+  {id:"OMN134",name:"Aethersling (1)",rarity:"R",img:LSS+"OMN134.webp",type:"Wizard Action",pitch:1},
+  {id:"OMN135",name:"Nucleus Aetherbolt (1)",rarity:"R",img:LSS+"OMN135.webp",type:"Wizard Action",pitch:1},
+  {id:"OMN136",name:"Turn to Mindfire (1)",rarity:"R",img:LSS+"OMN136.webp",type:"Wizard Action",pitch:1},
+  {id:"OMN137",name:"Haven Veil (1)",rarity:"R",img:LSS+"OMN137.webp",type:"Wizard Instant - Aura",pitch:1},
+  {id:"OMN138",name:"Haven Veil (2)",rarity:"R",img:LSS+"OMN138.webp",type:"Wizard Instant - Aura",pitch:2},
+  {id:"OMN139",name:"Haven Veil (3)",rarity:"R",img:LSS+"OMN139.webp",type:"Wizard Instant - Aura",pitch:3},
+  {id:"OMN140",name:"Third Eye of the Sphinx",rarity:"L",img:LSS+"OMN140.webp",type:"Illusionist / Wizard Equipment - Head"},
+  {id:"OMN141",name:"Plutonic Starplate",rarity:"L",img:LSS+"OMN141.webp",type:"Lightning Equipment - Chest"},
+  {id:"OMN142",name:"Constella Tiara",rarity:"C",img:LSS+"OMN142.webp",type:"Lightning Equipment - Head"},
+  {id:"OMN143",name:"Starflow Robes",rarity:"C",img:LSS+"OMN143.webp",type:"Lightning Equipment - Chest"},
+  {id:"OMN144",name:"Laced Lightning",rarity:"C",img:LSS+"OMN144.webp",type:"Lightning Equipment - Legs"},
+  {id:"OMN145",name:"Astral Strike (1)",rarity:"M",img:LSS+"OMN145.webp",type:"Lightning Action - Attack",pitch:1},
+  {id:"OMN146",name:"Flowstate Embodiment (1)",rarity:"M",img:LSS+"OMN146.webp",type:"Lightning Action - Attack",pitch:1},
+  {id:"OMN147",name:"Static Shelter (2)",rarity:"M",img:LSS+"OMN147.webp",type:"Lightning Defense Reaction",pitch:2},
+  {id:"OMN148",name:"Beckoning Brilliance (1)",rarity:"R",img:LSS+"OMN148.webp",type:"Lightning Action - Attack",pitch:1},
+  {id:"OMN149",name:"Flowshard Elemental (1)",rarity:"R",img:LSS+"OMN149.webp",type:"Lightning Action - Attack",pitch:1},
+  {id:"OMN150",name:"Lightning Form (1)",rarity:"R",img:LSS+"OMN150.webp",type:"Lightning Action - Attack",pitch:1},
+  {id:"OMN151",name:"Visionary of Orbits (1)",rarity:"R",img:LSS+"OMN151.webp",type:"Lightning Action - Attack",pitch:1},
+  {id:"OMN152",name:"Flowing Stormstrike (1)",rarity:"R",img:LSS+"OMN152.webp",type:"Lightning Action - Attack",pitch:1},
+  {id:"OMN153",name:"Meteoric Rise (1)",rarity:"R",img:LSS+"OMN153.webp",type:"Lightning Action - Attack",pitch:1},
+  {id:"OMN154",name:"Voltic Impact (1)",rarity:"R",img:LSS+"OMN154.webp",type:"Lightning Action - Attack",pitch:1},
+  {id:"OMN155",name:"Rift Breaker (1)",rarity:"R",img:LSS+"OMN155.webp",type:"Lightning Action - Attack",pitch:1},
+  {id:"OMN156",name:"Rift Breaker (2)",rarity:"R",img:LSS+"OMN156.webp",type:"Lightning Action - Attack",pitch:2},
+  {id:"OMN157",name:"Rift Breaker (3)",rarity:"R",img:LSS+"OMN157.webp",type:"Lightning Action - Attack",pitch:3},
+  {id:"OMN158",name:"Flow Through (3)",rarity:"R",img:LSS+"OMN158.webp",type:"Lightning Instant",pitch:3},
+  {id:"OMN159",name:"Livewire Press (1)",rarity:"R",img:LSS+"OMN159.webp",type:"Lightning Instant",pitch:1},
+  {id:"OMN160",name:"Astral Assault (1)",rarity:"C",img:LSS+"OMN160.webp",type:"Lightning Action - Attack",pitch:1},
+  {id:"OMN161",name:"Astral Assault (2)",rarity:"C",img:LSS+"OMN161.webp",type:"Lightning Action - Attack",pitch:2},
+  {id:"OMN162",name:"Astral Assault (3)",rarity:"C",img:LSS+"OMN162.webp",type:"Lightning Action - Attack",pitch:3},
+  {id:"OMN163",name:"Electrolyze (1)",rarity:"C",img:LSS+"OMN163.webp",type:"Lightning Action - Attack",pitch:1},
+  {id:"OMN164",name:"Electrolyze (2)",rarity:"C",img:LSS+"OMN164.webp",type:"Lightning Action - Attack",pitch:2},
+  {id:"OMN165",name:"Electrolyze (3)",rarity:"C",img:LSS+"OMN165.webp",type:"Lightning Action - Attack",pitch:3},
+  {id:"OMN166",name:"Flittering Spike (1)",rarity:"C",img:LSS+"OMN166.webp",type:"Lightning Action - Attack",pitch:1},
+  {id:"OMN167",name:"Flittering Spike (2)",rarity:"C",img:LSS+"OMN167.webp",type:"Lightning Action - Attack",pitch:2},
+  {id:"OMN168",name:"Flittering Spike (3)",rarity:"C",img:LSS+"OMN168.webp",type:"Lightning Action - Attack",pitch:3},
+  {id:"OMN169",name:"Glide Through Starlight (1)",rarity:"C",img:LSS+"OMN169.webp",type:"Lightning Action - Attack",pitch:1},
+  {id:"OMN170",name:"Glide Through Starlight (2)",rarity:"C",img:LSS+"OMN170.webp",type:"Lightning Action - Attack",pitch:2},
+  {id:"OMN171",name:"Glide Through Starlight (3)",rarity:"C",img:LSS+"OMN171.webp",type:"Lightning Action - Attack",pitch:3},
+  {id:"OMN172",name:"Heaven's Claws (1)",rarity:"C",img:LSS+"OMN172.webp",type:"Lightning Action - Attack",pitch:1},
+  {id:"OMN173",name:"Heaven's Claws (2)",rarity:"C",img:LSS+"OMN173.webp",type:"Lightning Action - Attack",pitch:2},
+  {id:"OMN174",name:"Heaven's Claws (3)",rarity:"C",img:LSS+"OMN174.webp",type:"Lightning Action - Attack",pitch:3},
+  {id:"OMN175",name:"Stellar Glide (1)",rarity:"C",img:LSS+"OMN175.webp",type:"Lightning Action - Attack",pitch:1},
+  {id:"OMN176",name:"Stellar Glide (2)",rarity:"C",img:LSS+"OMN176.webp",type:"Lightning Action - Attack",pitch:2},
+  {id:"OMN177",name:"Stellar Glide (3)",rarity:"C",img:LSS+"OMN177.webp",type:"Lightning Action - Attack",pitch:3},
+  {id:"OMN178",name:"Volatile Fluxor (1)",rarity:"C",img:LSS+"OMN178.webp",type:"Lightning Action - Attack",pitch:1},
+  {id:"OMN179",name:"Volatile Fluxor (2)",rarity:"C",img:LSS+"OMN179.webp",type:"Lightning Action - Attack",pitch:2},
+  {id:"OMN180",name:"Volatile Fluxor (3)",rarity:"C",img:LSS+"OMN180.webp",type:"Lightning Action - Attack",pitch:3},
+  {id:"OMN181",name:"Flittering Forcefield (1)",rarity:"C",img:LSS+"OMN181.webp",type:"Lightning Defense Reaction",pitch:1},
+  {id:"OMN182",name:"Flittering Forcefield (2)",rarity:"C",img:LSS+"OMN182.webp",type:"Lightning Defense Reaction",pitch:2},
+  {id:"OMN183",name:"Flittering Forcefield (3)",rarity:"C",img:LSS+"OMN183.webp",type:"Lightning Defense Reaction",pitch:3},
+  {id:"OMN184",name:"Calmveil of Volthaven (1)",rarity:"C",img:LSS+"OMN184.webp",type:"Lightning Instant",pitch:1},
+  {id:"OMN185",name:"Calmveil of Volthaven (2)",rarity:"C",img:LSS+"OMN185.webp",type:"Lightning Instant",pitch:2},
+  {id:"OMN186",name:"Calmveil of Volthaven (3)",rarity:"C",img:LSS+"OMN186.webp",type:"Lightning Instant",pitch:3},
+  {id:"OMN187",name:"Cosmic Flare (1)",rarity:"C",img:LSS+"OMN187.webp",type:"Lightning Instant",pitch:1},
+  {id:"OMN188",name:"Starworld Warning (2)",rarity:"C",img:LSS+"OMN188.webp",type:"Lightning Instant",pitch:2},
+  {id:"OMN189",name:"Starlight Road (3)",rarity:"C",img:LSS+"OMN189.webp",type:"Lightning Instant",pitch:3},
+  {id:"OMN190",name:"Stormshard (1)",rarity:"C",img:LSS+"OMN190.webp",type:"Lightning Instant",pitch:1},
+  {id:"OMN191",name:"Stormshatter (2)",rarity:"C",img:LSS+"OMN191.webp",type:"Lightning Instant",pitch:2},
+  {id:"OMN192",name:"Stormwhirl (3)",rarity:"C",img:LSS+"OMN192.webp",type:"Lightning Instant",pitch:3},
+  {id:"OMN193",name:"Chromatic Refinement (1)",rarity:"C",img:LSS+"OMN193.webp",type:"Lightning Instant - Aura",pitch:1},
+  {id:"OMN194",name:"Chromatic Refinement (2)",rarity:"C",img:LSS+"OMN194.webp",type:"Lightning Instant - Aura",pitch:2},
+  {id:"OMN195",name:"Chromatic Refinement (3)",rarity:"C",img:LSS+"OMN195.webp",type:"Lightning Instant - Aura",pitch:3},
+  {id:"OMN196",name:"Thunderous Retort (1)",rarity:"C",img:LSS+"OMN196.webp",type:"Lightning Instant - Aura",pitch:1},
+  {id:"OMN197",name:"Thunderous Retort (2)",rarity:"C",img:LSS+"OMN197.webp",type:"Lightning Instant - Aura",pitch:2},
+  {id:"OMN198",name:"Thunderous Retort (3)",rarity:"C",img:LSS+"OMN198.webp",type:"Lightning Instant - Aura",pitch:3},
+  {id:"OMN199",name:"Sigil of Astral Flow (3)",rarity:"C",img:LSS+"OMN199.webp",type:"Lightning Instant - Aura",pitch:3},
+  {id:"OMN200",name:"Sigil of Lightning (3)",rarity:"C",img:LSS+"OMN200.webp",type:"Lightning Instant - Aura",pitch:3},
+  {id:"OMN201",name:"Spellbane Sigil (3)",rarity:"C",img:LSS+"OMN201.webp",type:"Lightning Instant - Aura",pitch:3},
+  {id:"OMN202",name:"Embodiment of Lightning",rarity:"B",img:LSS+"OMN202.webp",type:"Elemental Token - Aura"},
+  {id:"OMN203",name:"Lightning Flow",rarity:"B",img:LSS+"OMN203.webp",type:"Elemental Token - Aura"},
+  {id:"OMN204",name:"Boots of Omnis Ward",rarity:"L",img:LSS+"OMN204.webp",type:"Generic Equipment - Legs"},
+  {id:"OMN205",name:"Seeker's Hood",rarity:"C",img:LSS+"OMN205.webp",type:"Generic Equipment - Head"},
+  {id:"OMN206",name:"Seeker's Gilet",rarity:"C",img:LSS+"OMN206.webp",type:"Generic Equipment - Chest"},
+  {id:"OMN207",name:"Seeker's Mitts",rarity:"C",img:LSS+"OMN207.webp",type:"Generic Equipment - Arms"},
+  {id:"OMN208",name:"Seeker's Leggings",rarity:"C",img:LSS+"OMN208.webp",type:"Generic Equipment - Legs"},
+  {id:"OMN209",name:"Helm of Astral Sanctuary",rarity:"C",img:LSS+"OMN209.webp",type:"Generic Equipment - Head"},
+  {id:"OMN210",name:"Robe of Astral Sanctuary",rarity:"C",img:LSS+"OMN210.webp",type:"Generic Equipment - Chest"},
+  {id:"OMN211",name:"Gloves of Astral Sanctuary",rarity:"C",img:LSS+"OMN211.webp",type:"Generic Equipment - Arms"},
+  {id:"OMN212",name:"Boots of Astral Sanctuary",rarity:"C",img:LSS+"OMN212.webp",type:"Generic Equipment - Legs"},
+  {id:"OMN213",name:"Browbeat (3)",rarity:"M",img:LSS+"OMN213.webp",type:"Generic Action - Attack",pitch:3},
+  {id:"OMN214",name:"Step Between (1)",rarity:"M",img:LSS+"OMN214.webp",type:"Generic Action - Attack",pitch:1},
+  {id:"OMN215",name:"Tempt Over (2)",rarity:"M",img:LSS+"OMN215.webp",type:"Generic Action - Attack",pitch:2},
+  {id:"OMN216",name:"Ominous Aggression (1)",rarity:"R",img:LSS+"OMN216.webp",type:"Generic Instant",pitch:1},
+  {id:"OMN217",name:"Ominous Excavation (3)",rarity:"R",img:LSS+"OMN217.webp",type:"Generic Instant",pitch:3},
+  {id:"OMN218",name:"Ominous Respite (2)",rarity:"R",img:LSS+"OMN218.webp",type:"Generic Instant",pitch:2},
+  {id:"OMN219",name:"Conflicting Thoughts (1)",rarity:"C",img:LSS+"OMN219.webp",type:"Generic Action - Attack",pitch:1},
+  {id:"OMN220",name:"Conflicting Thoughts (2)",rarity:"C",img:LSS+"OMN220.webp",type:"Generic Action - Attack",pitch:2},
+  {id:"OMN221",name:"Conflicting Thoughts (3)",rarity:"C",img:LSS+"OMN221.webp",type:"Generic Action - Attack",pitch:3},
+  {id:"OMN222",name:"Brush Off (1)",rarity:"C",img:LSS+"OMN222.webp",type:"Generic Instant",pitch:1},
+  {id:"OMN223",name:"Brush Off (2)",rarity:"C",img:LSS+"OMN223.webp",type:"Generic Instant",pitch:2},
+  {id:"OMN224",name:"Brush Off (3)",rarity:"C",img:LSS+"OMN224.webp",type:"Generic Instant",pitch:3},
+  {id:"OMN225",name:"Ponder",rarity:"B",img:LSS+"OMN225.webp",type:"Generic Token - Aura"},
+  {id:"OMN226",name:"Cracked Bauble (2)",rarity:"B",img:LSS+"OMN226.webp",type:"Generic Resource",pitch:2},
+  {id:"OMN227",name:"Omens of Arcana",rarity:"B",img:LSS+"OMN227.webp",type:"Omens of the Third Age Macro"},
+  {id:"OMN228",name:"Unmake the Underlings (3)",rarity:"M",img:LSS+"OMN228.webp",type:"Assassin Action - Attack",pitch:3},
+  {id:"OMN229",name:"Feral Instinct (2)",rarity:"M",img:LSS+"OMN229.webp",type:"Brute Action - Attack",pitch:2},
+  {id:"OMN230",name:"Pile Driver",rarity:"M",img:LSS+"OMN230.webp",type:"Guardian Weapon - Log (2H)"},
+  {id:"OMN231",name:"Swift Pickup (1)",rarity:"M",img:LSS+"OMN231.webp",type:"Ninja Action - Attack",pitch:1},
+  {id:"OMN232",name:"Evasive Nageboshi (3)",rarity:"M",img:LSS+"OMN232.webp",type:"Ninja Instant - Shuriken Item",pitch:3},
+  {id:"OMN233",name:"Razor Ring (3)",rarity:"M",img:LSS+"OMN233.webp",type:"Ninja Instant - Shuriken Item",pitch:3},
+  {id:"OMN234",name:"Stun Star (3)",rarity:"M",img:LSS+"OMN234.webp",type:"Ninja Instant - Shuriken Item",pitch:3},
+  {id:"OMN235",name:"Gear Turner (1)",rarity:"M",img:LSS+"OMN235.webp",type:"Mechanologist Action - Attack",pitch:1},
+  {id:"OMN236",name:"Arcbane Grasp (3)",rarity:"M",img:LSS+"OMN236.webp",type:"Mechanologist Instant Equipment - Evo Base Arms",pitch:3},
+  {id:"OMN237",name:"Settle the Bill (1)",rarity:"M",img:LSS+"OMN237.webp",type:"Ranger Action",pitch:1},
+  {id:"OMN238",name:"Beckon Steel (3)",rarity:"M",img:LSS+"OMN238.webp",type:"Warrior Attack Reaction",pitch:3},
+  {id:"OMN239",name:"Crash Site Salvage (2)",rarity:"M",img:LSS+"OMN239.webp",type:"Pirate Mechanologist Action - Attack",pitch:2},
+  {id:"OMN240",name:"Golden Skull (2)",rarity:"M",img:LSS+"OMN240.webp",type:"Pirate Necromancer Action - Item",pitch:2},
+  {id:"OMN241",name:"Red Lure Harpoon (3)",rarity:"M",img:LSS+"OMN241.webp",type:"Pirate Ranger Action - Arrow Attack",pitch:3},
+  {id:"OMN242",name:"Fortitude of Anvilheim",rarity:"L",img:LSS+"OMN242.webp",type:"Guardian / Warrior Equipment - Off-Hand"},
+  {id:"OMN243",name:"A Bit off the Side (1)",rarity:"M",img:LSS+"OMN243.webp",type:"Guardian / Warrior Action",pitch:1},
+  {id:"OMN244",name:"Blessing of Aegis (2)",rarity:"M",img:LSS+"OMN244.webp",type:"Light Action - Aura",pitch:2},
+  {id:"OMN245",name:"Draco Fire (1)",rarity:"M",img:LSS+"OMN245.webp",type:"Draconic Instant",pitch:1},
+  {id:"OMN246",name:"Induce Panic (2)",rarity:"M",img:LSS+"OMN246.webp",type:"Chaos Block",pitch:2},
+  {id:"OMN247",name:"Lionclaw Maul",rarity:"M",img:LSS+"OMN247.webp",type:"Reviled Guardian Weapon - Hammer Axe (1H)"},
+  {id:"OMN248",name:"Starfield Veil",rarity:"M",img:LSS+"OMN248.webp",type:"Lightning Illusionist Equipment - Head"},
+  {id:"OMN249",name:"Starfield Carapace",rarity:"M",img:LSS+"OMN249.webp",type:"Lightning Illusionist Equipment - Chest"},
+  {id:"OMN250",name:"Starfield Touch",rarity:"M",img:LSS+"OMN250.webp",type:"Lightning Illusionist Equipment - Arms"},
 ];
 
 // ── DATA SETUP ───────────────────────────────────────────────────────────────
 
 function buildPool() {
-  const pool = [...REVEALED];
-  const add = (rarity, n, pfx, type) => {
-    for (let i = 0; i < n; i++)
-      pool.push({ id:`${pfx}${i}`, name:`Unrevealed ${RM[rarity].label}`, rarity, img:null, type });
-  };
-  // Adjusted for all known reveals through World Premiere
-  add("C", 82, "uc", "Unrevealed Common");  // +1: Ominous Respite n13 moved from C→R
-  add("R", 31, "ur", "Unrevealed Rare");    // 60 total - 29 revealed R
-  add("M", 22, "um", "Unrevealed Majestic");// 37 total - 15 revealed M
-  add("M", 25, "um", "Unrevealed Majestic");
-  add("L",  4, "ul", "Unrevealed Legendary");
-  add("F",  1, "uf", "Unrevealed Fabled");
-  add("B", 14, "ub", "Unrevealed Basic");
-  add("MV",12, "umv","Unrevealed Marvel");
-  return pool;
+  // All 251 cards are known — no placeholders needed
+  return [...REVEALED];
 }
 
 const POOL = buildPool();
 const BY   = { T:[], B:[], C:[], R:[], M:[], L:[], MV:[], F:[] };
 POOL.forEach(c => { if (BY[c.rarity]) BY[c.rarity].push(c); });
 
-// Commons split by class for pack collation.
-// FaB limited sets use "6-7 class commons evenly distributed between classes."
-// OTA has 3 Lightning heroes → 3 per class + 2 generic = 11 commons per pack.
+// Commons split by class for pack collation (exclude Basic-rarity cards from C pool).
+// OTA: 3 Lightning Illusionist + 3 Lightning Runeblade + 3 Lightning Wizard + 2 generic = 11 C/pack
+const isC = c => c.rarity === "C";
 const CC = {
-  runeblade:   POOL.filter(c => c.rarity==="C" && (c.type||"").includes("Lightning Runeblade")),
-  wizard:      POOL.filter(c => c.rarity==="C" && (c.type||"").includes("Lightning Wizard")),
-  illusionist: POOL.filter(c => c.rarity==="C" && (c.type||"").includes("Lightning Illusionist")),
-  generic:     POOL.filter(c => c.rarity==="C"
+  runeblade:   POOL.filter(c => isC(c) && (c.type||"").includes("Lightning Runeblade")),
+  wizard:      POOL.filter(c => isC(c) && (c.type||"").includes("Lightning Wizard")),
+  illusionist: POOL.filter(c => isC(c) && (c.type||"").includes("Lightning Illusionist")),
+  generic:     POOL.filter(c => isC(c)
     && !(c.type||"").includes("Lightning Runeblade")
     && !(c.type||"").includes("Lightning Wizard")
     && !(c.type||"").includes("Lightning Illusionist")),
 };
+// Basic pool: heroes, weapons, tokens, macro, resource
+const BASIC_POOL = POOL.filter(c => c.rarity === "B");
 
 let _uid = 0;
 const stamp = (c, pi) => ({ ...c, _iid:`${pi}-${++_uid}`, _pack:pi });
@@ -241,7 +362,7 @@ function buildPack(pi, revealedOnly = false) {
   const mPool  = BY.M.filter(rev);
   const lPool  = BY.L.filter(rev);
   const fPool  = BY.F.filter(rev);
-  const bPool  = BY.B.filter(rev);
+  const bPool  = BASIC_POOL.filter(rev);
   const mvPool = BY.MV.filter(rev);
   const ccR    = CC.runeblade.filter(rev);
   const ccW    = CC.wizard.filter(rev);
@@ -252,7 +373,6 @@ function buildPack(pi, revealedOnly = false) {
   const cards  = [];
 
   // 11 Commons — collated by class: 3 per Lightning class + 2 generic
-  // Mirrors FaB's "evenly distributed between classes" limited design principle
   const commons = [
     ...pickN(ccR, 3), ...pickN(ccW, 3), ...pickN(ccI, 3), ...pickN(ccG, 2),
   ];
@@ -306,24 +426,32 @@ function buildPack(pi, revealedOnly = false) {
 
 function getClass(c) {
   const t = c.type || "";
-  if (t.startsWith("Unrevealed"))                       return "Unrevealed";
-  if (t.includes("Token")||t.includes("Macro"))         return "Token / Macro";
-  if (t.includes("Lightning Runeblade"))                return "Lightning Runeblade";
-  if (t.includes("Lightning Wizard"))                   return "Lightning Wizard";
-  if (t.includes("Lightning Illusionist"))              return "Lightning Illusionist";
-  if (t.includes("Lightning"))                          return "Lightning";
-  if (t.includes("Illusionist")&&t.includes("Wizard")) return "Illusionist / Wizard";
-  if (t.includes("Wizard"))                             return "Wizard";
-  if (t.includes("Draconic"))                           return "Draconic";
-  if (t.includes("Runeblade"))                          return "Runeblade";
-  if (t.includes("Pirate Mechanologist"))               return "Pirate Mechanologist";
-  if (t.includes("Pirate Ranger"))                      return "Pirate Ranger";
-  if (t.includes("Reviled Guardian"))                   return "Reviled Guardian";
-  if (t.includes("Guardian"))                           return "Guardian";
-  if (t.includes("Mechanologist"))                      return "Mechanologist";
-  if (t.includes("Assassin"))                           return "Assassin";
-  if (t.includes("Brute"))                              return "Brute";
-  if (t.includes("Ranger"))                             return "Ranger";
+  if (t.startsWith("Unrevealed"))                        return "Unrevealed";
+  if (c.rarity === "B")                                  return "Basic";
+  if (t.includes("Token")||t.includes("Macro")||t.includes("Resource - Gem")) return "Token / Macro";
+  if (t.includes("Lightning Runeblade"))                 return "Lightning Runeblade";
+  if (t.includes("Lightning Wizard"))                    return "Lightning Wizard";
+  if (t.includes("Lightning Illusionist"))               return "Lightning Illusionist";
+  if (t.includes("Lightning"))                           return "Lightning";
+  if (t.includes("Illusionist")&&t.includes("Wizard"))  return "Illusionist / Wizard";
+  if (t.includes("Illusionist"))                         return "Illusionist";
+  if (t.includes("Wizard"))                              return "Wizard";
+  if (t.includes("Draconic"))                            return "Draconic";
+  if (t.includes("Runeblade"))                           return "Runeblade";
+  if (t.includes("Pirate Mechanologist"))                return "Pirate Mechanologist";
+  if (t.includes("Pirate Ranger"))                       return "Pirate Ranger";
+  if (t.includes("Pirate Necromancer"))                  return "Pirate Necromancer";
+  if (t.includes("Reviled Guardian"))                    return "Reviled Guardian";
+  if (t.includes("Guardian")&&t.includes("Warrior"))    return "Guardian / Warrior";
+  if (t.includes("Guardian"))                            return "Guardian";
+  if (t.includes("Mechanologist"))                       return "Mechanologist";
+  if (t.includes("Assassin"))                            return "Assassin";
+  if (t.includes("Brute"))                               return "Brute";
+  if (t.includes("Ninja"))                               return "Ninja";
+  if (t.includes("Ranger"))                              return "Ranger";
+  if (t.includes("Warrior"))                             return "Warrior";
+  if (t.includes("Light "))                              return "Light";
+  if (t.includes("Chaos"))                               return "Chaos";
   return "Generic";
 }
 
@@ -572,7 +700,7 @@ function EmptyState({ icon, title, description, children }) {
 
 // ── VIEWS ─────────────────────────────────────────────────────────────────────
 
-function HomeView({ onGenPack, onGenSealed, onPrintTokens, revealedOnly, onToggleRevealedOnly }) {
+function HomeView({ onGenPack, onGenSealed, onPrintTokens, revealedOnly, onToggleRevealedOnly, includeBs, onToggleIncludeBs }) {
   const counts = Object.entries(RM).map(([r,m]) => ({ r,m, n:BY[r].length })).filter(x => x.n);
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:"1.5rem" }}>
@@ -639,6 +767,35 @@ function HomeView({ onGenPack, onGenSealed, onPrintTokens, revealedOnly, onToggl
             }} />
           </span>
           Revealed cards only
+        </button>
+        {/* Include basics toggle */}
+        <button
+          onClick={onToggleIncludeBs}
+          title={includeBs
+            ? "Basic cards (heroes, weapons, tokens) will be included when printing"
+            : "Basic cards excluded from print output"}
+          style={{
+            display:"inline-flex", alignItems:"center", gap:7,
+            padding:"7px 12px", borderRadius:6, cursor:"pointer",
+            fontFamily:"inherit", fontSize:12, fontWeight:600,
+            background: !includeBs ? "#ef444422" : "transparent",
+            color:       !includeBs ? "#f87171"   : T.muted,
+            border:`1px solid ${!includeBs ? "#ef444466" : T.border}`,
+            transition:"all 0.15s",
+          }}
+        >
+          <span style={{
+            display:"inline-flex", width:30, height:16, borderRadius:8, flexShrink:0,
+            background: includeBs ? T.accent : T.dim,
+            position:"relative", transition:"background 0.15s",
+          }}>
+            <span style={{
+              position:"absolute", top:2, left: includeBs ? 16 : 2,
+              width:12, height:12, borderRadius:"50%", background:"#fff",
+              transition:"left 0.15s",
+            }} />
+          </span>
+          Print basic cards
         </button>
       </div>
 
@@ -1075,6 +1232,9 @@ export default function App() {
   const [expanded,   setExpanded] = useState({});
   const [hero,       setHero]     = useState(null);
   const [revealedOnly, setRevealedOnly] = useState(false);
+  const [includeBs,    setIncludeBs]    = useState(true);
+
+  const filterPrint = cards => includeBs ? cards : cards.filter(c => c.rarity !== "B");
 
   const genPack = () => { setPack(buildPack(Date.now(), revealedOnly)); setView("pack"); };
   const genSealed = () => {
@@ -1093,7 +1253,7 @@ export default function App() {
   const deckCards = flatPool.filter(c => deckSet.has(c._iid));
 
   // Promo pack print — all 14 pre-release kit cards
-  const printTokens = () => openPrintWindow(PROMO_PACK.map((c, i) => ({ ...c, _iid:`promo-${i}`, _pack:0 })));
+  const printTokens = () => openPrintWindow(filterPrint(PROMO_PACK.map((c, i) => ({ ...c, _iid:`promo-${i}`, _pack:0 }))));
 
   // All tabs are always clickable — empty states handle the "not yet generated" case
   const tabs = [
@@ -1231,10 +1391,11 @@ export default function App() {
         {/* Main content */}
         <main className="m-main" style={{ maxWidth:1280, margin:"0 auto", padding:"28px 24px" }}>
           {view==="home"   && <HomeView onGenPack={genPack} onGenSealed={genSealed} onPrintTokens={printTokens}
-              revealedOnly={revealedOnly} onToggleRevealedOnly={() => setRevealedOnly(x => !x)} />}
+              revealedOnly={revealedOnly} onToggleRevealedOnly={() => setRevealedOnly(x => !x)}
+              includeBs={includeBs} onToggleIncludeBs={() => setIncludeBs(x => !x)} />}
 
           {view==="pack" && (pack
-            ? <PackView pack={pack} onRegen={genPack} onPrint={() => openPrintWindow(pack)} />
+            ? <PackView pack={pack} onRegen={genPack} onPrint={() => openPrintWindow(filterPrint(pack))} />
             : <EmptyState icon="🃏" title="No pack generated yet"
                 description="Generate a booster pack to open 16 cards from Omens of the Third Age.">
                 <Btn onClick={genPack}>Generate booster pack</Btn>
@@ -1243,7 +1404,7 @@ export default function App() {
 
           {view==="sealed" && (pools
             ? <SealedView pools={pools} expanded={expanded} setExpanded={setExpanded}
-                onRegen={genSealed} onPrint={() => openPrintWindow(flatPool)}
+                onRegen={genSealed} onPrint={() => openPrintWindow(filterPrint(flatPool))}
                 onDeck={() => setView("deck")} />
             : <EmptyState icon="📦" title="No sealed pool yet"
                 description="Generate 8 booster packs to practice building a sealed deck.">
@@ -1253,7 +1414,7 @@ export default function App() {
 
           {view==="deck" && (flatPool.length > 0
             ? <DeckView flatPool={flatPool} deckSet={deckSet} deckCards={deckCards}
-                onToggle={toggleCard} onPrint={() => openPrintWindow(deckCards)}
+                onToggle={toggleCard} onPrint={() => openPrintWindow(filterPrint(deckCards))}
                 hero={hero} setHero={setHero} />
             : <EmptyState icon="✦" title="No cards to build with"
                 description="You need a sealed pool before you can build a deck. Generate one now and go straight to the deck builder.">
